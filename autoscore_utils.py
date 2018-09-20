@@ -9,6 +9,8 @@ Created on Wed Sep 19 11:36:53 2018
 import pandas as pd
 import os
 import h5py
+import skvideo.io
+import numpy as np 
 
 summary = pd.read_csv('/home/sebastian/code/keras-kinetics-i3d/data/csv/mouse_training_OS_calcium_1.csv')
 
@@ -49,7 +51,23 @@ vids = sorted([f for f in os.listdir(vid_root) if '.avi'  in f and (int(f.split(
 
 print(len(vids))
 
+videodata = [skvideo.io.vread(os.path.join(vid_root,vids[i])) for i in range(1)]
+videodata = videodata[0][:,:,:690,:]
+scoremat = np.zeros((videodata.shape[0],))
+
+for i,row in sheet_64.iterrows():
+    if row.n_trial>0:
+        break
+    if row.start_stop:
+        start = row.frame
+    else:
+        scoremat[start:row.frame]=True
+        videodata[start:row.frame,0:10,0:10,:]=0
+
 data = h5py.File('/home/sebastian/Desktop/data.h5','w')
-data.create_dataset("X", (1000,600,500,3), dtype='i')
-data.create_dataset("Y", (1000,1), dtype='i')
+data['X']=videodata
+data['Y']=scoremat
+data.close()
+#data.create_dataset("X", (1000,400,400,3), dtype='i')
+#data.create_dataset("Y", (1000,1), dtype='i')
 

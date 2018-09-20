@@ -43,7 +43,7 @@ def train(path_train, batch_size, path_val = None, t_size = 10):
         data_val = h5py.open(path_train,'r')
         X_val = data_val['X']
         Y_val = data_val['Y']
-        val_generator = i3d_generator(X_val, Y_val, 20, t_size)
+        val_generator = i3d_generator(X_val, Y_val, 5, t_size)
         model_final.fit_generator(train_generator,
                                   steps_per_epoch=2000,
                                   epochs=50,

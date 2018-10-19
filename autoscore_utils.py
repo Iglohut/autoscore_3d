@@ -11,63 +11,72 @@ import os
 import h5py
 import skvideo.io
 import numpy as np 
-
-summary = pd.read_csv('/home/sebastian/code/keras-kinetics-i3d/data/csv/mouse_training_OS_calcium_1.csv')
-
-data_1    = pd.read_csv('/home/sebastian/code/keras-kinetics-i3d/data/csv/mouse_training_OS_calcium_1_log.csv')
-data_2    = pd.read_csv('/home/sebastian/code/keras-kinetics-i3d/data/csv/mouse_training_OS_calcium_log 2.csv')
-
-data = pd.concat([data_1,data_2])
-final_sheet = {'subject':[],'n_trial':[],'frame':[],'start_stop':[]}
+import matplotlib.pyplot as plt
 
 n_trial = 0
 current_frame=0
 n_trial_category = {}
-for i,row in data.iterrows():
+
+vid_root_1 = '/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space'
+vid_root_2 = '/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space/11.07.2017-12.07.2017 os videos'
+
+vids = sorted([os.path.join(vid_root_1,f) for f in os.listdir(vid_root_1) if '.avi'  in f and 'raw' in f])[:20]
+vids1 = sorted([os.path.join(vid_root_2,f)  for f in os.listdir(vid_root_2) if '.avi'  in f and  'raw' in f])
+vids2 = sorted([os.path.join(vid_root_1,f) for f in os.listdir(vid_root_1) if '.avi'  in f and  'raw' in f])[20:]
+vids_raw = vids+vids1+vids2 
+
+vids = sorted([os.path.join(vid_root_1,f) for f in os.listdir(vid_root_1) if '.avi'  in f and not 'raw' in f])[:20]
+vids1 = sorted([os.path.join(vid_root_2,f)  for f in os.listdir(vid_root_2) if '.avi'  in f and not 'raw' in f])
+vids2 = sorted([os.path.join(vid_root_1,f) for f in os.listdir(vid_root_1) if '.avi'  in f and not 'raw' in f])[20:]
+vids = vids+vids1+vids2 
+
+for vid in vids:
+    print(vid)
     
-    if row.type == 'TR' :
-        if row.start_stop==False:
-            n_trial+=1
-            
-        else:
-            if summary.iloc[n_trial].subject in n_trial_category.keys():
-                n_trial_category[summary.iloc[n_trial].subject]+=1
-            else:
-                n_trial_category[summary.iloc[n_trial].subject]=0
-            current_frame = int(row.frame)
-    else:
-        final_sheet['subject'].append(summary.iloc[n_trial].subject)
-        final_sheet['n_trial'].append(n_trial_category[summary.iloc[n_trial].subject])
-        final_sheet['frame'].append(int(row.frame-current_frame))
-        final_sheet['start_stop'].append(row.start_stop)
+f = h5py.File('data/data.h5','w')
 
-final_sheet = pd.DataFrame.from_dict(final_sheet)
+X = f.create_dataset('X',shape = (1, 384, 512, 3),maxshape = (None, 384, 512, 3),chunks=(7, 384, 512, 3),compression='gzip')
+Y = f.create_dataset('Y',shape = (1,), maxshape = (None,))
 
-sheet_64 = final_sheet[final_sheet.subject==32364]
+position = 0
+delimiters = [position]
 
-vid_root = '/media/sebastian/MYLINUXLIVE/MT/tracking_cropped'
+for i, vid in enumerate(vids):
+    
+    print(str(i)+'/'+str(len(vids)))
+    
+    videodata = skvideo.io.vread(vid) 
+    
+    blackness = np.diff(((videodata[:,0:5,0:5,:].sum(3)==0).sum(1).sum(1)>0).astype(np.int))
+    start = np.argmax(blackness)
+    end = np.where(blackness==blackness.min())[-1][-1]
+    
+    videodata = videodata[start:end]
+    
+    redness = (np.logical_and(videodata[:,:,:,0]==255,videodata[:,:,:,1]==0,videodata[:,:,:,2]==0)).sum(1).sum(1)>1000
+    
+    videodata = skvideo.io.vread(vids_raw[i])[start:end,:,:,:]
+    
+    position
+    
+    X.resize([position+videodata.shape[0], 384, 512, 3])
+    Y.resize([position+videodata.shape[0]])
+    X[position:position+videodata.shape[0],:,:,:] = videodata
+    Y[position:position+videodata.shape[0]]=redness
+    position+=videodata.shape[0]
+    
+    delimiters.append(position) 
+    
 
-vids = sorted([f for f in os.listdir(vid_root) if '.avi'  in f and (int(f.split('.')[0].split('_')[-1]))%2])
+f['delimiters']=delimiters
 
-print(len(vids))
+testvid = np.zeros((1000,384, 512, 3))
 
-videodata = [skvideo.io.vread(os.path.join(vid_root,vids[i])) for i in range(1)]
-videodata = videodata[0][:,:,:690,:]
-scoremat = np.zeros((videodata.shape[0],))
+start = 1000
+idcs = f['Y'][start:start+1000]
+testvid = f['X'][start:start+1000,:,:,:]
+testvid[idcs.astype(np.bool),0:10,0:10,:]=255
 
-for i,row in sheet_64.iterrows():
-    if row.n_trial>0:
-        break
-    if row.start_stop:
-        start = row.frame
-    else:
-        scoremat[start:row.frame]=True
-        videodata[start:row.frame,0:10,0:10,:]=0
-
-data = h5py.File('/home/sebastian/Desktop/data.h5','w')
-data['X']=videodata
-data['Y']=scoremat
-data.close()
-#data.create_dataset("X", (1000,400,400,3), dtype='i')
-#data.create_dataset("Y", (1000,1), dtype='i')
+skvideo.io.vwrite('data/test.avi',testvid)
+f.close()
 

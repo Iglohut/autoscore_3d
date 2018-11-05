@@ -511,10 +511,10 @@ def Inception_Inflated3d(include_top=True,
 
         if not endpoint_logit:
             x = Activation('softmax', name='prediction')(x)
-    else:
-        h = int(x.shape[2])
-        w = int(x.shape[3])
-        x = AveragePooling3D((2, h, w), strides=(1, 1, 1), padding='valid', name='global_avg_pool')(x)
+#    else:
+#        h = int(x.shape[2])
+#        w = int(x.shape[3])
+#        x = AveragePooling3D((2, h, w), strides=(1, 1, 1), padding='valid', name='global_avg_pool')(x)
 
 
 

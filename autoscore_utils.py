@@ -77,6 +77,6 @@ idcs = f['Y'][start:start+1000]
 testvid = f['X'][start:start+1000,:,:,:]
 testvid[idcs.astype(np.bool),0:10,0:10,:]=255
 
-skvideo.io.vwrite('data/test.avi',testvid)
+skvideo.io.vwrite('/home/deeplabchop/src/autoscore_3d/data/test.avi',testvid)
 f.close()
 

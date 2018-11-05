@@ -1,0 +1,16 @@
+# Path to folder containing a round of raw OS videos and log/scheme csv files
+video_set: /home/iglohut/Documents/MemDyn/OS_Data/Videos/Round7
+
+# Path to where the h5 training set must be stored (will be huge, external storage suggested)
+store_h5_path: /media/iglohut/UFDRecovery
+
+# Number of frames to use per nBatch x nframes x width x height x RGB input
+n_frames: 10
+
+# Size of width x height to resize ALL videos to. The network will only be able to get input from this size!
+resize:
+  width: 384
+  height: 512
+
+
+

@@ -1,3 +1,6 @@
+# Iglohut version under constriction
+This version will specifically focus on OS data.
+
 # keras-kinetics-i3d
 Keras implementation (including pretrained weights) of Inflated 3d Inception architecture reported in the paper [Quo Vadis, Action Recognition? A New Model and the Kinetics Dataset](https://arxiv.org/abs/1705.07750).
 

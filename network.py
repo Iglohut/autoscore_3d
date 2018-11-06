@@ -26,7 +26,7 @@ def get_network(model_name):
     input_shape = (None, None, None, 3)
 
     if model_name in os.listdir('.'):
-        model_final = load_model('autoscore_checkpoint')
+        model_final = load_model(model_name)
         print('Loaded existing model')
 
     else:

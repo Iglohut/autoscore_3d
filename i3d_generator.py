@@ -10,7 +10,7 @@ import numpy as np
 from keras.utils.data_utils import Sequence
 
 class i3d_generator(Sequence):
-    def __init__(self, X, Y, batch_size, input_frames, randomize = True, train_val_split=1,train=True ):
+    def __init__(self, X, Y, batch_size, input_frames, randomize = True, train_val_split = 1,train = True ):
         self.X = X
         self.Y = Y 
         input_size = (input_frames,)+X.shape[1:]
@@ -19,7 +19,7 @@ class i3d_generator(Sequence):
         self.batch_size = batch_size
         self.input_size = input_size
         if train:
-            self.idcs = np.arange(0,int((X.shape[0]-input_size[0]-1)*train_val_split),3)
+            self.idcs = np.arange(0, int((X.shape[0]-input_size[0]-1)*train_val_split), 3)
         else:
             self.idcs = np.arange(int((X.shape[0]-input_size[0]-1)*train_val_split),X.shape[0]-input_size[0]-1,3)
             

@@ -168,7 +168,7 @@ video_path = Path(config['video_set'])
 log_path, scheme_path = get_csv_paths(video_path)
 
 # Set parameters
-nframes = config['n_frames'] # Number of frames to read
+nframes = config['model_params']['n_frames'] # Number of frames to read
 video_resize_width = config['resize']['width']
 video_resize_height = config['resize']['height']
 

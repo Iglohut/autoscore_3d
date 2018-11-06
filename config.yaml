@@ -4,9 +4,6 @@ video_set: /home/iglohut/Documents/MemDyn/OS_Data/Videos/Round7
 # Path to where the h5 training set must be stored (will be huge, external storage suggested)
 store_h5_path: /media/iglohut/UFDRecovery
 
-# Number of frames to use per nBatch x nframes x width x height x RGB input
-n_frames: 10
-
 # Size of width x height to resize ALL videos to. The network will only be able to get input from this size!
 resize:
   width: 384
@@ -14,3 +11,23 @@ resize:
 
 
 
+# NETWORK TRAIN RELATED #
+
+# Data set used for training the network
+dataset: /media/iglohut/Elements/Internship/Autoscore_iglo/Data/old_data/data.h5
+
+model_params:
+  # Name of main model to load/train/save
+  name: autoscore_checkpoint
+  # Number of frames to use per nBatch x nframes x width x height x RGB input
+  n_frames: 9
+  # Batch size of training
+  batch_size: 7
+  # Percentage of data set used for training (leftover for validation)
+  train_val_split: 0.9
+  # Number of epochs
+  n_epochs: 10
+  # Number of iterations per epoch for training
+  n_iters_train: 1000
+  # Number of iterations per epoch for testing
+  n_iters_val: 1000

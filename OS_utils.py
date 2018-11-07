@@ -161,6 +161,35 @@ def get_video_paths(video_path):
     return videos
 
 
+def get_slices(data, project_path, n_frames=9, val_split=0.9):
+    """
+    Gets the slice indices of the data that are used for training and validation.
+    """
+    if not Path(project_path + 'slices.pkl').exists():
+        print("Making training and validation set in project_path + 'slices.pkl'")
+        sets = [slice(0 + i * n_frames, n_frames * i + n_frames) for i in
+                range(int((data['X'].shape[0] - n_frames) / n_frames))]  # stacked windows of t_size
+        slices_x = np.random.permutation(sets)
+        slices_train = slices_x[0: int(val_split * len(slices_x))]
+        slices_val = slices_x[int(val_split * len(slices_x)):]
+
+        df_train = pd.DataFrame(slices_train, columns=['slices_train'])
+        df_val = pd.DataFrame(slices_val, columns=['slices_val'])
+        df = pd.concat([df_train, df_val], axis=1)
+        df.to_pickle(project_path + 'slices.pkl')
+
+    # Read existing slices
+    slices = pd.read_pickle(project_path + 'slices.pkl')
+
+    slices_val = slices['slices_val']
+    slices_val = slices_val.dropna().values
+
+    slices_train = slices['slices_train']
+    slices_train = slices_train.dropna().values
+
+    return slices_train, slices_val
+
+
 # Set the paths
 config_path = Path(os.getcwd()).resolve()
 config = read_yaml(config_path / 'config.yaml')

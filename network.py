@@ -22,11 +22,11 @@ from OS_utils import read_yaml
 
 
 
-def get_network(model_name):
+def get_network(model_path):
     input_shape = (None, None, None, 3)
 
-    if model_name in os.listdir('.'):
-        model_final = load_model(model_name)
+    if Path(model_path).exists():
+        model_final = load_model(model_path)
         print('Loaded existing model')
 
     else:
@@ -57,3 +57,21 @@ def get_network(model_name):
                             metrics=['mae', 'acc'])
 
     return model_final
+
+def noob_network():
+    from keras.models import Sequential
+    model = Sequential()
+    input_shape = (None, None, None, 3)
+    model.add(Conv3D(2, kernel_size=(1, 3, 3), strides=(1, 1, 1), padding='valid', data_format=None,
+                       dilation_rate=(1, 1, 1), activation=None, input_shape=input_shape))
+    model.add(Lambda(lambda x: K.mean(x, axis=-2)))
+    model.add(Lambda(lambda x: K.mean(x, axis=-2)))
+    model.add(Lambda(lambda x: K.mean(x, axis=-2)))
+    model.add(Activation('softmax'))
+    sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    model.compile(loss='binary_crossentropy', optimizer=sgd,
+                        metrics=['mae', 'acc'])
+
+    return model
+
+

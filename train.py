@@ -1,9 +1,8 @@
 from i3d_generator import i3d_generator, SS_generator
 import h5py
-from keras.callbacks import ModelCheckpoint
 import os
 from pathlib import Path
-from OS_utils import read_yaml, get_slices
+from OS_utils import read_yaml, get_slices, Logger
 from network import get_network, noob_network
 
 
@@ -11,6 +10,7 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 import copy
 import numpy as np
+
 
 def train():
     # Get config file
@@ -26,89 +26,89 @@ def train():
     n_iters_val = config['model_params']['n_iters_val']
     model_name = config['model_params']['name']
     project_path = os.getcwd() + '/project/'
-    model_path = project_path + model_name
+    model_path = project_path + model_name + '_checkpoint'
 
     # Load data
     data = h5py.File(config['dataset'], 'r')
-    # X = data['X']
-    # Y = data['Y']
+
 
     # Creating or loading model
     # model_final = get_network(model_path)
-    model_final = noob_network() # Weak model with same input-output to test
+    model_final = noob_network() # Weak model with same input-output to debug
 
-    checkpoint = ModelCheckpoint(model_path, monitor='val_loss', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 
+    # Metric logger
+    logger = Logger(project_path, model_name)
 
     # Training vs validation generator
-    slices_train, slices_val = get_slices(data, project_path, n_frames=n_frames, val_split=val_split)
-
-    # train_generator = i3d_generator(X, Y, batch_size, n_frames,train_val_split=val_split,train=True )
-    #
-    # val_generator = i3d_generator(X, Y, batch_size, n_frames,train_val_split=val_split,train=False )
-
+    slices_train, slices_val = get_slices(data, project_path, model_name, n_frames=n_frames, val_split=val_split)
 
     generator_train = SS_generator(data = data, slices = slices_train,  batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours)
-    generator_val = SS_generator(data=data, slices=slices_val, batch_size=batch_size, input_frames=n_frames, n_labels=n_behaviours)
+    generator_val = SS_generator(data = data, slices = slices_val, batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours)
 
 
+    for epochi in range(logger.start_epoch, n_epochs + 1):
+        # Metrics for AUROC
+        Y_reals =[]
+        Y_preds =[]
+        metrics_train =[]
 
-    # Per epoch
-    Y_reals =[]
-    Y_preds =[]
-    metrics_train =[]
-    metric_names = model_final.metrics_names
-
-    for i in range(n_iters_train):
-    # Per iteration
-        X, Y = generator_train()
-        metrics_train.append(model_final.train_on_batch(X, Y))
+        for traini in range(n_iters_train): # Training loop
+            X, Y = generator_train()
+            metrics_train.append(model_final.train_on_batch(X, Y)) # This trains the model!
 
 
-        Y_predicted = model_final.predict_on_batch(X)
-        Y_reals = np.append(copy.copy(Y_reals), copy.copy(Y[:,0]))
-        Y_preds = np.append(copy.copy(Y_preds), copy.copy(Y_predicted[:,0]))
+            Y_predicted = model_final.predict_on_batch(X)
+            Y_reals = np.append(copy.copy(Y_reals), copy.copy(Y[:,0]))
+            Y_preds = np.append(copy.copy(Y_preds), copy.copy(Y_predicted[:,0]))
 
         fpr_train, tpr_train, thresholds_train = roc_curve(Y_reals, Y_preds)
         auc_train = auc(fpr_train, tpr_train)
-
-
-
         metrics_train_mean = np.mean(metrics_train, axis=0)
-        print("train loss: {}, train mae: {}, train acc: {}, train auc: {}".format(metrics_train_mean[0], metrics_train_mean[1], metrics_train_mean[2], auc_train), end='\r')
 
 
-    # model_final.test_on_batch(X, Y)
+        # Metrics for AUROC
+        Y_reals =[]
+        Y_preds =[]
+        metrics_val=[]
+        for vali in range(n_iters_val): # Validation loop
+            X, Y = generator_val()
+            metrics_val.append(model_final.test_on_batch(X, Y))
+
+            Y_predicted = model_final.predict_on_batch(X)
+            Y_reals = np.append(copy.copy(Y_reals), copy.copy(Y[:, 0]))
+            Y_preds = np.append(copy.copy(Y_preds), copy.copy(Y_predicted[:, 0]))
+
+        fpr_val, tpr_val, thresholds_val = roc_curve(Y_reals, Y_preds)
+        auc_val = auc(fpr_val, tpr_val)
+        metrics_val_mean = np.mean(metrics_val, axis=0)
 
 
-    # model_final.fit_generator(train_generator.__getitem__(),
-    #                       steps_per_epoch= n_iters_train,
-    #                       epochs= n_epochs,
-    #                       validation_data=val_generator.__getitem__(),
-    #                       validation_steps= n_iters_val,
-    #                       callbacks = [checkpoint])
-    #
-    #
-    # model_final.save(model_path)
-
-
+        print("Epoch {}: train loss: {:.5f}, train mae: {:.5f}, train acc: {:.3f}, train auc: {:.3f} | val loss: {:.5f}, val mae: {:.5f}, val acc: {:.3f}, val auc: {:.3f}".format(
+                                                                               str(epochi) +'/'+str(n_epochs),
+                                                                               metrics_train_mean[0],
+                                                                               metrics_train_mean[1],
+                                                                               metrics_train_mean[2],
+                                                                               auc_train,
+                                                                               metrics_val_mean[0],
+                                                                               metrics_val_mean[1],
+                                                                               metrics_val_mean[2],
+                                                                               auc_val))
+        # Saving stuff
+        model_final.save(model_path)
+        logger.store(epochi, metrics_train_mean[0],
+        metrics_train_mean[1],
+        metrics_train_mean[2],
+        auc_train,
+        metrics_val_mean[0],
+        metrics_val_mean[1],
+        metrics_val_mean[2],
+        auc_val)
 
 
 
 # Use function:
 train()
-
-
-
-
-
-
-
-# TODO Make this a slices_train, slices_val function to input SS_generator(data, slices) with __call__
-# TODO Try to equal the labels out somehow (from slices_x?): if this works, maybe create overlapping slices instead of stack
-
-
-
 
 
 # data['Y'][slices_val[0]][[-int(np.ceil(t_size/2))]][0]

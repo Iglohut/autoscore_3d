@@ -7,6 +7,7 @@ import yaml
 from pathlib import Path
 import cv2
 import random
+import csv
 
 # For csv
 def read_yaml(yaml_path):
@@ -161,12 +162,13 @@ def get_video_paths(video_path):
     return videos
 
 
-def get_slices(data, project_path, n_frames=9, val_split=0.9):
+def get_slices(data, project_path, model_name, n_frames=9, val_split=0.9):
     """
     Gets the slice indices of the data that are used for training and validation.
     """
-    if not Path(project_path + 'slices.pkl').exists():
-        print("Making training and validation set in project_path + 'slices.pkl'")
+    slice_path = str(project_path) + model_name + '_slices.pkl'
+    if not Path(slice_path).exists():
+        print("Making training and validation set in", slice_path)
         sets = [slice(0 + i * n_frames, n_frames * i + n_frames) for i in
                 range(int((data['X'].shape[0] - n_frames) / n_frames))]  # stacked windows of t_size
         slices_x = np.random.permutation(sets)
@@ -176,10 +178,10 @@ def get_slices(data, project_path, n_frames=9, val_split=0.9):
         df_train = pd.DataFrame(slices_train, columns=['slices_train'])
         df_val = pd.DataFrame(slices_val, columns=['slices_val'])
         df = pd.concat([df_train, df_val], axis=1)
-        df.to_pickle(project_path + 'slices.pkl')
+        df.to_pickle(slice_path)
 
     # Read existing slices
-    slices = pd.read_pickle(project_path + 'slices.pkl')
+    slices = pd.read_pickle(slice_path)
 
     slices_val = slices['slices_val']
     slices_val = slices_val.dropna().values
@@ -188,6 +190,36 @@ def get_slices(data, project_path, n_frames=9, val_split=0.9):
     slices_train = slices_train.dropna().values
 
     return slices_train, slices_val
+
+
+class Logger(object):
+    def __init__(self, project_path, model_name):
+        self.project_path = project_path
+        self.model_name = model_name
+        self.logpath = Path(self.project_path + self.model_name + '_metrics_logger.csv').resolve()
+
+        if not self.logpath.exists():
+            print("Making a new metrics logfile in", str(self.logpath))
+            data = {'Epoch': [], 'train_loss': [], 'train mae': [], 'train acc': [], 'train auc': [], 'val_loss': [],
+                    'val mae': [], 'val acc': [], 'val auc': []}
+            df = pd.DataFrame.from_dict(data)
+            df.to_csv(self.logpath, index=False)
+
+            self.start_epoch = 1
+        else:
+            df = pd.read_csv(self.logpath)
+            self.start_epoch = len(df['Epoch']) + 1
+
+
+    def store(self, epoch, train_loss, train_mae, train_acc, train_auc, val_loss, val_mae, val_acc, val_auc):
+        f = open(self.logpath, 'a')
+        writer = csv.writer(f)
+        writer.writerow([epoch, train_loss, train_mae, train_acc, train_auc, val_loss, val_mae, val_acc, val_auc])
+        f.close()
+
+
+
+
 
 
 # Set the paths

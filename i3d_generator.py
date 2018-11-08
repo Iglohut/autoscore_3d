@@ -44,7 +44,7 @@ class SS_generator(Sequence):
     def __init__(self, data, slices,  batch_size, input_frames, n_labels):
         self.X = data['X']
         self.Y = data['Y']
-        self.slices = slices
+        self.slices = np.random.permutation(slices)
         self.batch_size = batch_size
         self.n_frames = input_frames
         self.X_size = (self.n_frames,)+ self.X.shape[1:]

@@ -59,6 +59,7 @@ def get_network(model_path):
     return model_final
 
 def noob_network():
+    print("Making noob network!")
     from keras.models import Sequential
     model = Sequential()
     input_shape = (None, None, None, 3)

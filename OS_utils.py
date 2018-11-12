@@ -220,78 +220,78 @@ class Logger(object):
 
 
 
-
-
-# Set the paths
-config_path = Path(os.getcwd()).resolve()
-config = read_yaml(config_path / 'config.yaml')
-video_path = Path(config['video_set'])
-log_path, scheme_path = get_csv_paths(video_path)
-
-# Set parameters
-nframes = config['model_params']['n_frames'] # Number of frames to read
-video_resize_width = config['resize']['width']
-video_resize_height = config['resize']['height']
-
-
-# # Make the summary_sheet.csv
-# make_summary_csv(log_path, scheme_path) # This doesn't need to be called in later versions. get_summary_file does this.
-
-
-# Video stuff
-video_name  = video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0001_raw.avi'
-
-round_summary = get_summary_file(video_path)
-
-# runs_range = range(int(round_summary.run_nr.min()),int(round_summary.run_nr.max()))
-
-all_videos = get_video_paths(video_path)
-
-# This should go in a loop
-current_video = random.choice(all_videos)
-current_run = int(current_video.split('t')[-1].split('_')[0])
-
-
-current_runsummary = round_summary.loc[round_summary['run_nr'] == current_run] # All info from current video
-
-
-
-
-
-_vidlength(video_name) # TODO !! Change make_summary to deduct vidlength of all previous videos from current frame.. download all videos first :(
-_vidlength(video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0002_raw.avi')
-_vidlength(video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0003_raw.avi')
-_vidlength(video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0004_raw.avi')
-
-
-
-
-# TODO 1. Open random videos and create nvid random segments of 10 frames with y label for last frame: ((n, 10, x, y, 3), (n))
-## TODO 1.1. Store in h5 file: on usb stick
-### TODO 1.2. Remember to read final_sheet and match... Remember maybe loop over folder of rounds1-8 randomly too OR do it per round slowly as my laptop can't handle much anyway
-#### TODO 1.2.1. Balance classes yes/no
-# TODO Make own generator that access h5 lines directly and not load entire file
-
-# vids = sorted([f for f in os.listdir(vid_root) if '.avi' in f and (int(f.split('.')[0].split('_')[-1].split('t')[-1]))%2]) # Do this withotu the splti check
 #
 #
-# print(len(vids))
+## Set the paths
+#config_path = Path(os.getcwd()).resolve()
+#config = read_yaml(config_path / 'config.yaml')
+#video_path = Path(config['video_set'])
+#log_path, scheme_path = get_csv_paths(video_path)
 #
-# videodata = [skvideo.io.vread(os.path.join(vid_root,vids[i])) for i in range(1)]
-# videodata = videodata[0][:,:,:512,:]
-# scoremat = np.zeros((videodata.shape[0],))
+## Set parameters
+#nframes = config['model_params']['n_frames'] # Number of frames to read
+#video_resize_width = config['resize']['width']
+#video_resize_height = config['resize']['height']
 #
-# for i,row in sheet_64.iterrows():
-#     if row.n_trial>0:
-#         break
-#     if row.start_stop:
-#         start = row.frame
-#     else:
-#         scoremat[start:row.frame]=True
-#         videodata[start:row.frame,0:10,0:10,:]=0
 #
-# data = h5py.File('/home/iglohut/Documents/MemDyn/OS_Data/data.h5','w')
-# data['X']=videodata
-# data['Y']=scoremat
-# data.close()
-
+## # Make the summary_sheet.csv
+## make_summary_csv(log_path, scheme_path) # This doesn't need to be called in later versions. get_summary_file does this.
+#
+#
+## Video stuff
+#video_name  = video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0001_raw.avi'
+#
+#round_summary = get_summary_file(video_path)
+#
+## runs_range = range(int(round_summary.run_nr.min()),int(round_summary.run_nr.max()))
+#
+#all_videos = get_video_paths(video_path)
+#
+## This should go in a loop
+#current_video = random.choice(all_videos)
+#current_run = int(current_video.split('t')[-1].split('_')[0])
+#
+#
+#current_runsummary = round_summary.loc[round_summary['run_nr'] == current_run] # All info from current video
+#
+#
+#
+#
+#
+#_vidlength(video_name) # TODO !! Change make_summary to deduct vidlength of all previous videos from current frame.. download all videos first :(
+#_vidlength(video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0002_raw.avi')
+#_vidlength(video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0003_raw.avi')
+#_vidlength(video_path / 'mouse_training_OS_5trials_inteldis_32_35_t0004_raw.avi')
+#
+#
+#
+#
+## TODO 1. Open random videos and create nvid random segments of 10 frames with y label for last frame: ((n, 10, x, y, 3), (n))
+### TODO 1.1. Store in h5 file: on usb stick
+#### TODO 1.2. Remember to read final_sheet and match... Remember maybe loop over folder of rounds1-8 randomly too OR do it per round slowly as my laptop can't handle much anyway
+##### TODO 1.2.1. Balance classes yes/no
+## TODO Make own generator that access h5 lines directly and not load entire file
+#
+## vids = sorted([f for f in os.listdir(vid_root) if '.avi' in f and (int(f.split('.')[0].split('_')[-1].split('t')[-1]))%2]) # Do this withotu the splti check
+##
+##
+## print(len(vids))
+##
+## videodata = [skvideo.io.vread(os.path.join(vid_root,vids[i])) for i in range(1)]
+## videodata = videodata[0][:,:,:512,:]
+## scoremat = np.zeros((videodata.shape[0],))
+##
+## for i,row in sheet_64.iterrows():
+##     if row.n_trial>0:
+##         break
+##     if row.start_stop:
+##         start = row.frame
+##     else:
+##         scoremat[start:row.frame]=True
+##         videodata[start:row.frame,0:10,0:10,:]=0
+##
+## data = h5py.File('/home/iglohut/Documents/MemDyn/OS_Data/data.h5','w')
+## data['X']=videodata
+## data['Y']=scoremat
+## data.close()
+#

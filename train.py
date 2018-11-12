@@ -3,7 +3,7 @@ import h5py
 import os
 from pathlib import Path
 from OS_utils import read_yaml, get_slices, Logger
-from network import get_network, noob_network
+from network import get_network, noob_network, get_network_bigger
 
 
 from sklearn.metrics import roc_curve
@@ -33,8 +33,9 @@ def train():
 
 
     # Creating or loading model
-    # model_final = get_network(model_path)
-    model_final = noob_network() # Weak model with same input-output to debug
+#    model_final = get_network(model_path)
+    model_final = get_network_bigger(model_path)
+#    model_final = noob_network() # Weak model with same input-output to debug
 
 
     # Metric logger

@@ -1,4 +1,4 @@
-name: autoscore
+name: autoscore1
 channels:
   - anaconda
   - defaults

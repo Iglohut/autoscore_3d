@@ -63,7 +63,7 @@ class SS_generator(Sequence):
         self.batch_Y = np.zeros(self.Y_size_batch)
 
         for slice_i in range(self.batch_size):
-            if self.cur_slice > self.total_slices: # If gone over all slices: shuffle set and start anew
+            if self.cur_slice >= self.total_slices: # If gone over all slices: shuffle set and start anew
                 self.cur_slice = 0
                 self.slices = np.random.permutation(self.slices)
 

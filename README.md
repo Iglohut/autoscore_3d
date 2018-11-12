@@ -6,6 +6,14 @@ The model uses transfer learning of the model by the original paper. That is, th
 This repository is by no means a package. It is currently merely under construction.
 
 
+###### Environment
+It is suggested to create an anaconda environment for this repository using the environment.yml file:
+```
+cd ~/autoscore_3d
+conda env create -f environment.yml
+```
+To use the environment `source activate autoscore1` (improved name pending).
+
 Original Repository info
 ======
 ## keras-kinetics-i3d

@@ -34,8 +34,8 @@ def train():
 
     # Creating or loading model
 #    model_final = get_network(model_path)
-    model_final = get_network_bigger(model_path)
-#    model_final = noob_network() # Weak model with same input-output to debug
+#    model_final = get_network_bigger(model_path)
+    model_final = noob_network() # Weak model with same input-output to debug
 
 
     # Metric logger
@@ -112,11 +112,21 @@ def train():
 train()
 
 
-# data['Y'][slices_val[0]][[-int(np.ceil(t_size/2))]][0]
-
-# train('/home/sebastian/Desktop/data.h5',10)
 
 
+# import matplotlib.pyplot as plt
+# import cv2
+# import random
+#
+#
+#
+# X, Y = generator_train()
+#
+# frame = X[0,0,:]
+#
+#
+# plt.imshow(frame.astype(np.int32)),plt.title('Input'), plt.axis('off')
 
-
-
+# #
+# # plt.subplot(121),plt.imshow(frame.astype(np.int32)),plt.title('Input'), plt.axis('off')
+# # plt.subplot(122),plt.imshow(noised_image.astype(np.int32)),plt.title('Output'), plt.axis('off')

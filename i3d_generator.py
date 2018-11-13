@@ -130,7 +130,7 @@ class SS_generator(Sequence):
 
     def _noise_batch(self):
         magnitude = random.uniform(-1.5, 1.5) # Noise between -1.5 and 1.5 std
-        self.batch_X = self.batch_X + magnitude * self.batch_X.std() * np.random.random(self.batch_X.shape)
+        self.batch_X += magnitude * self.batch_X.std() * np.random.random(self.batch_X.shape)
 
     def _correct_type(self):
         # Removes values below 0 and rounds pixel values

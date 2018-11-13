@@ -45,7 +45,7 @@ def train():
     slices_train, slices_val = get_slices(data, project_path, model_name, n_frames=n_frames, val_split=val_split)
 
     generator_train = SS_generator(data = data, slices = slices_train,  batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours)
-    generator_val = SS_generator(data = data, slices = slices_val, batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours)
+    generator_val = SS_generator(data = data, slices = slices_val, batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours, p_augment = 0)
 
 
     for epochi in range(logger.start_epoch, n_epochs + 1):
@@ -126,7 +126,7 @@ train()
 #
 #
 # plt.imshow(frame.astype(np.int32)),plt.title('Input'), plt.axis('off')
-
+#
 # #
 # # plt.subplot(121),plt.imshow(frame.astype(np.int32)),plt.title('Input'), plt.axis('off')
 # # plt.subplot(122),plt.imshow(noised_image.astype(np.int32)),plt.title('Output'), plt.axis('off')

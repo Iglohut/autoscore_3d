@@ -73,7 +73,6 @@ class SS_generator(Sequence):
             Ypoint = int(random.uniform(Yloc - discharge, Yloc + discharge) * rows)
             return [Xpoint, Ypoint]
 
-        # Xout = copy.copy(self.batch_X)
         batches, frames, rows, cols, ch = self.batch_X.shape
 
         # Relative object locations

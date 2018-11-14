@@ -181,7 +181,7 @@ def get_slices(data, project_path, model_name, n_frames=9, val_split=0.9, equal_
                                'labels': labels})
             df_1 = df.loc[df['labels'] == 1]
             df_0 = df.loc[df['labels'] == 0]
-            df_0 = df_0.sample(n=len(df_1), replace=False) # Because label 1 is most common
+            df_0 = df_0.sample(n=len(df_1), replace=False) # Because label 1 is least common
             df = df_1.append(df_0)
             sets = list(df['slices'].values)
 

@@ -162,15 +162,30 @@ def get_video_paths(video_path):
     return videos
 
 
-def get_slices(data, project_path, model_name, n_frames=9, val_split=0.9):
+def get_slices(data, project_path, model_name, n_frames=9, val_split=0.9, equal_labels=1, n_stacker=1):
     """
     Gets the slice indices of the data that are used for training and validation.
     """
+    def midlabel(y, n_frames):
+        return y[-int(np.ceil(n_frames / 2))]
+
     slice_path = str(project_path) + model_name + '_slices.pkl'
     if not Path(slice_path).exists():
         print("Making training and validation set in", slice_path)
-        sets = [slice(0 + i * n_frames, n_frames * i + n_frames) for i in
-                range(int((data['X'].shape[0] - n_frames) / n_frames))]  # stacked windows of t_size
+        sets = [slice(0 + i * n_stacker, n_stacker * i + n_frames) for i in
+                range(int((data['X'].shape[0] - n_frames) / n_stacker))]  # stacked windows of t_size
+
+        if equal_labels:
+            labels = [midlabel(data['Y'][sets[i]], n_frames) for i in range(len(sets))]
+            df = pd.DataFrame({'slices': sets,
+                               'labels': labels})
+            df_1 = df.loc[df['labels'] == 1]
+            df_0 = df.loc[df['labels'] == 0]
+            df_0 = df_0.sample(n=len(df_1), replace=False) # Because label 1 is most common
+            df = df_1.append(df_0)
+            sets = list(df['slices'].values)
+
+
         slices_x = np.random.permutation(sets)
         slices_train = slices_x[0: int(val_split * len(slices_x))]
         slices_val = slices_x[int(val_split * len(slices_x)):]

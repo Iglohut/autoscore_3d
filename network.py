@@ -22,6 +22,9 @@ from OS_utils import read_yaml
 
 from i3d_inception import conv3d_bn
 
+from keras.backend.tensorflow_backend import set_session
+import tensorflow as tf
+
 
 def get_network_bigger(model_path):
     input_shape = (None, None, None, 3)
@@ -60,6 +63,11 @@ def get_network_bigger(model_path):
         model_final.compile(loss='binary_crossentropy', optimizer=sgd,
                             metrics=['mae', 'acc'])
 
+    # Limit memory
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
+    sess = tf.Session(config=config)
+    set_session(sess)  # set this TensorFlow session as the default session for Keras
     return model_final
 
 
@@ -99,6 +107,11 @@ def get_network(model_path):
         model_final.compile(loss='binary_crossentropy', optimizer=sgd,
                             metrics=['mae', 'acc'])
 
+    # Limit memory
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
+    sess = tf.Session(config=config)
+    set_session(sess)  # set this TensorFlow session as the default session for Keras
     return model_final
 
 
@@ -122,6 +135,11 @@ def noob_network():
     model.compile(loss='binary_crossentropy', optimizer=sgd,
                         metrics=['mae', 'acc'])
 
+    # Limit memory
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
+    sess = tf.Session(config=config)
+    set_session(sess)  # set this TensorFlow session as the default session for Keras
     return model
 
 

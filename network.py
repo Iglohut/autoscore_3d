@@ -92,7 +92,7 @@ def get_network(model_path):
         rgb_model.layers.pop()  # Deleting the last AveragePooling3D Layer
         output_old = rgb_model.layers[-1].output
 
-        x = Conv3D(5, kernel_size=(1, 3, 3), strides=(1, 1, 1), padding='valid', data_format=None,
+        x = Conv3D(2, kernel_size=(1, 3, 3), strides=(1, 1, 1), padding='valid', data_format=None,
                    dilation_rate=(1, 1, 1), activation=None)(output_old)
 
         x = Lambda(lambda x: K.mean(x, axis=-2))(x)
@@ -108,10 +108,10 @@ def get_network(model_path):
                             metrics=['mae', 'acc'])
 
     # Limit memory
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
-    sess = tf.Session(config=config)
-    set_session(sess)  # set this TensorFlow session as the default session for Keras
+#    config = tf.ConfigProto()
+#    config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
+#    sess = tf.Session(config=config)
+#    set_session(sess)  # set this TensorFlow session as the default session for Keras
     return model_final
 
 

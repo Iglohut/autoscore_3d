@@ -54,7 +54,7 @@ def im_equalize_hist(sourceframe, frame):
 #input_video = '/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space/mouse_training_OS_calcium_1_t0001_raw.avi'
 input_video = '/home/deeplabchop/src/autoscore_iglo2/mouse_training_OS_5trials_inteldis_59_66_or_206_13_t0001_raw.avi'
 #"/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space/mouse_training_OS_calcium_1_t0001_raw.avi"
-model_path = "/home/deeplabchop/src/autoscore_iglo2/project/henk_checkpoint"
+model_path = "/home/deeplabchop/src/autoscore_3d/autoscore_model_2"
 data_path ='/home/deeplabchop/src/autoscore_3d/data/data.h5'
 model_final = load_model(model_path)
 print("loaded model")

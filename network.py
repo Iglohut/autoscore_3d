@@ -109,6 +109,33 @@ def get_network(model_path):
 
 
 
+def ST_network(model_path):
+    input_shape = (9, 384, 512, 3) # Generalize later
+    
+    if Path(model_path).exists():
+        model_final = load_model(model_path)
+        print('Loaded existing model')
+
+    else:
+        print("Creating new model for you!")
+        rgb_model = Inception_Inflated3d(
+            include_top=False,
+            weights='rgb_imagenet_and_kinetics',
+            input_shape=(input_shape))
+
+        
+        output_old = rgb_model.layers[-1].output
+        
+        x = Reshape((1024,) ,name='Reshape_top')(output_old)
+        x = Dense(50,activation = 'selu',name='Dense_top_1')(x)
+        x = Dense(2,activation = 'sigmoid',name='Dense_top_2')(x)
+
+        sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        model_final = Model(input=rgb_model.input, output=[x])
+        model_final.compile(loss = 'binary_crossentropy',optimizer = sgd,
+                  metrics=['mae', 'acc'])
+
+
 
 
 

@@ -43,7 +43,7 @@ def hist_matching(c, c_t, im):
      return im
 
 
-def im_equalize_hist(sourceframe, frame):
+def im_equalize_hist(baseframe, frame):
     newim = np.zeros(frame.shape, dtype=np.int)
     for i in range(frame.shape[-1]):
         c_t = cdf(baseframe[:,:,i].astype(int))

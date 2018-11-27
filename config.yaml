@@ -18,19 +18,22 @@ dataset: /media/iglohut/Elements/Internship/Autoscore_iglo/Data/old_data/data.h5
 
 model_params:
   # Name of main model to load/train/save
-  name: henk
+  name: nepmodel
   # Number of frames to use per nBatch x nframes x width x height x RGB input: middle frame is used as target
   n_frames: 9
+  # frame apart interval: e.g. n_frames are taken,e ach n_steps apart
+  n_frames_steps: 4
   # Batch size of training
   batch_size: 7
   # Percentage of data set used for training (leftover is for validation)
   train_val_split: 0.9
   # Number of epochs
-  n_epochs: 100
+  n_epochs: 10000
   # Number of iterations per epoch for training
   n_iters_train: 1
   # Number of iterations per epoch for testing
   n_iters_val: 1
+
 
 
 behaviours:

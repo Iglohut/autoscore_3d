@@ -109,8 +109,10 @@ def get_network(model_path):
 
 
 
-def ST_network(model_path):
-    input_shape = (9, 384, 512, 3) # Generalize later
+def original_networkish(model_path, input_shape):
+    # n_frames = 19
+    # input_shape = (n_frames, 384, 512, 3) # Generalize later
+    # input_shape = (None, None, None, 3)
     
     if Path(model_path).exists():
         model_final = load_model(model_path)
@@ -125,18 +127,59 @@ def ST_network(model_path):
 
         
         output_old = rgb_model.layers[-1].output
-        
-        x = Reshape((1024,) ,name='Reshape_top')(output_old)
-        x = Dense(50,activation = 'selu',name='Dense_top_1')(x)
-        x = Dense(2,activation = 'sigmoid',name='Dense_top_2')(x)
+
+        h = int(output_old.shape[2])
+        w = int(output_old.shape[3])
+
+        x = AveragePooling3D((2, h, w), strides=(1, 1, 1), padding='valid', name='global_avg_pool')(output_old)
+        # x = AveragePooling3D((2, 7, 7), strides=(1, 1, 1), padding='valid', name='global_avg_pool')(output_old)
+
+        x = conv3d_bn(x, 2, 1, 1, 1, padding='same',
+                      use_bias=True, use_activation_fn=False, use_bn=False, name='Conv3d_6a_1x1')
+
+        num_frames_remaining = int(x.shape[1])
+        x = Reshape((num_frames_remaining, 2))(x)
+
+        # logits (raw scores for each class)
+        x = Lambda(lambda x: K.mean(x, axis=1, keepdims=False),
+                   output_shape=lambda s: (s[0], s[2]))(x)
+        x = Activation('softmax', name='prediction')(x)
 
         sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
         model_final = Model(input=rgb_model.input, output=[x])
         model_final.compile(loss = 'binary_crossentropy',optimizer = sgd,
                   metrics=['mae', 'acc'])
+    return model_final
 
 
 
+def ST_network(model_path, input_shape):
+    if Path(model_path).exists():
+        model_final = load_model(model_path)
+        print('Loaded existing model')
+
+    else:
+        print("Creating new model for you!")
+        rgb_model = Inception_Inflated3d(
+            include_top=False,
+            weights='rgb_imagenet_and_kinetics',
+            input_shape=(input_shape))
+
+        output_old = rgb_model.layers[-1].output
+
+        h = int(output_old.shape[2])
+        w = int(output_old.shape[3])
+
+        x = AveragePooling3D((2, h, w), strides=(1, 1, 1), padding='valid', name='global_avg_pool')(output_old)
+
+        x = Reshape((1024,) ,name='Reshape_top')(x)
+        x = Dense(50,activation = 'selu',name='Dense_top_1')(x)
+        x = Dense(2,activation = 'sigmoid',name='Dense_top_2')(x)
+        sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        model_final = Model(input=rgb_model.input, output=[x])
+        model_final.compile(loss='binary_crossentropy', optimizer=sgd,
+                            metrics=['mae', 'acc'])
+    return model_final
 
 
 def noob_network():

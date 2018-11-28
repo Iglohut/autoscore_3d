@@ -3,7 +3,7 @@ import h5py
 import os
 from pathlib import Path
 from OS_utils import read_yaml, get_slices, Logger
-from network import get_network, noob_network, get_network_bigger
+from network import get_network, noob_network, get_network_bigger, original_networkish, ST_network
 
 
 from sklearn.metrics import roc_curve
@@ -20,6 +20,7 @@ def train():
     n_behaviours = len(config['behaviours'])
     batch_size = config['model_params']['batch_size']
     n_frames = config['model_params']['n_frames']
+    n_frames_steps = config['model_params']['n_frames_steps']
     val_split = config['model_params']['train_val_split']
     n_epochs = config['model_params']['n_epochs']
     n_iters_train = config['model_params']['n_iters_train']
@@ -35,17 +36,19 @@ def train():
     # Creating or loading model
 #    model_final = get_network(model_path)
 #    model_final = get_network_bigger(model_path)
-    model_final = noob_network() # Weak model with same input-output to debug
+#     model_final = noob_network() # Weak model with same input-output to debug
+    model_final = original_networkish(model_path, (n_frames,) + data["X"].shape[1:])
+#     model_final = ST_network(model_path, (n_frames,) + data["X"].shape[1:])
 
 
     # Metric logger
     logger = Logger(project_path, model_name)
 
     # Training vs validation generator
-    slices_train, slices_val = get_slices(data, project_path, model_name, n_frames=n_frames, val_split=val_split)
+    slices_train, slices_val = get_slices(data, project_path, model_name, n_frames=n_frames, val_split=val_split, n_stacker = n_frames, steps = n_frames_steps)
 
-    generator_train = SS_generator(data = data, slices = slices_train,  batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours)
-    generator_val = SS_generator(data = data, slices = slices_val, batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours, p_augment = 0)
+    generator_train = SS_generator(data = data, slices = slices_train,  batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours, p_resize= -1)
+    generator_val = SS_generator(data = data, slices = slices_val, batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours, p_augment = -1)
 
 
     for epochi in range(logger.start_epoch, n_epochs + 1):
@@ -94,7 +97,7 @@ def train():
                                                                                metrics_val_mean[0],
                                                                                metrics_val_mean[1],
                                                                                metrics_val_mean[2],
-                                                                               auc_val))
+                                                                                   auc_val))
         # Saving stuff
         model_final.save(model_path)
         logger.store(epochi, metrics_train_mean[0],
@@ -108,7 +111,7 @@ def train():
 
 
 
-# Use function:
+    # Use function:
 train()
 
 

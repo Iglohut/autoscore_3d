@@ -1,3 +1,8 @@
+import os
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+# The GPU id to use, usually either "0" or "1"
+os.environ["CUDA_VISIBLE_DEVICES"]="1" 
+
 from i3d_generator import i3d_generator, SS_generator
 import h5py
 import os
@@ -35,9 +40,9 @@ def train():
 
     # Creating or loading model
 #    model_final = get_network(model_path)
-#    model_final = get_network_bigger(model_path)
+    model_final = get_network_bigger(model_path)
 #     model_final = noob_network() # Weak model with same input-output to debug
-    model_final = original_networkish(model_path, (n_frames,) + data["X"].shape[1:])
+#    model_final = original_networkish(model_path, (n_frames,) + data["X"].shape[1:])
 #     model_final = ST_network(model_path, (n_frames,) + data["X"].shape[1:])
 
 
@@ -45,9 +50,9 @@ def train():
     logger = Logger(project_path, model_name)
 
     # Training vs validation generator
-    slices_train, slices_val = get_slices(data, project_path, model_name, n_frames=n_frames, val_split=val_split, n_stacker = n_frames, steps = n_frames_steps)
+    slices_train, slices_val = get_slices(data, project_path, model_name, n_frames=n_frames, val_split=val_split, n_stacker = 1, steps = n_frames_steps)
 
-    generator_train = SS_generator(data = data, slices = slices_train,  batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours, p_resize= -1)
+    generator_train = SS_generator(data = data, slices = slices_train,  batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours, p_resize= -1, p_augment = 0.8)
     generator_val = SS_generator(data = data, slices = slices_val, batch_size = batch_size, input_frames = n_frames, n_labels = n_behaviours, p_augment = -1)
 
 

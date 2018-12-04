@@ -16,7 +16,9 @@ from keras.models import Model, load_model
 import numpy as np
 import h5py
 from skimage.exposure import cumulative_distribution
-
+from OS_utils import read_yaml
+from pathlib import Path
+import cv2
 
 def cdf(im):
      '''
@@ -51,19 +53,27 @@ def im_equalize_hist(baseframe, frame):
         newim[:,:,i] = hist_matching(c, c_t, frame[:,:,i])
     return newim
 
+
+
+
+
+# Setting parameters
+n_frames = 9
+n_frames_steps = 3
+
+
+# Some paths
 #input_video = '/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space/mouse_training_OS_calcium_1_t0001_raw.avi'
-input_video = '/home/deeplabchop/src/autoscore_iglo2/mouse_training_OS_5trials_inteldis_59_66_or_206_13_t0001_raw.avi'
-#"/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space/mouse_training_OS_calcium_1_t0001_raw.avi"
-model_path = "/home/deeplabchop/src/autoscore_3d/autoscore_model_2"
+#input_video = '/home/deeplabchop/src/autoscore_iglo2/mouse_training_OS_5trials_inteldis_59_66_or_206_13_t0001_raw.avi'
+input_video = "/home/deeplabchop/src/autoscore_iglo2/rat_training_OS_baseline_ repeat_2_t0001_raw.avi"
+model_path = "/home/deeplabchop/src/autoscore_iglo2/project/henk_original_checkpoint"
 data_path ='/home/deeplabchop/src/autoscore_3d/data/data.h5'
 model_final = load_model(model_path)
 print("loaded model")
 
 
 reader = skvideo.io.vreader(input_video)
-vwriter = skvideo.io.FFmpegWriter('/home/deeplabchop/Desktop/vid2_OS.mp4')
-
-b_w = False
+vwriter = skvideo.io.FFmpegWriter('/home/deeplabchop/Desktop/vid2_henk_origin.mp4')
 
 # Extra stuff
 data = h5py.File(data_path, 'r')
@@ -72,33 +82,43 @@ baseframe = data["X"][::10000,:,:].mean(0)
 
 
 
+# Preprocessing stuff
+
+input_shape = tuple(np.shape(model_final.input)[2:4]) # Height and Width
+#cv2.resize(frame, input_shape)
+video_shape = skvideo.io.FFmpegReader(input_video).getShape()
+total_frames = video_shape[0]
+
+
 
 frames = []
 labels = []
 for i,frame in enumerate(reader):
-    if i>90:
-        
-        
-        if b_w:
-            for f in range (3):
-                frame[:,:,f] = frame.mean(-1)
-        
-        
-        frames.append(im_equalize_hist(baseframe, frame))
-        
-        if len(frames) == 9:
     
-            X = np.array([frames])
+    # Some preprocessing
+    frame = im_equalize_hist(baseframe, frame)
+    if input_shape[0] and (not video_shape[1:3] == input_shape): cv2.resize(frame, input_shape)
+    
+    
+    
+    
+    if i>400 and i <total_frames-400: # Predicter loop
+        
+        frames.append(frame)
+        
+        if len(frames) == n_frames * n_frames_steps: 
+    
+            X = np.array([frames[slice(0, n_frames * n_frames_steps, n_frames_steps)]])
             Y = model_final.predict(X)
             
             current_frame = frames[4][::2,::2,:].copy()#.repeat(2,axis = 0).repeat(2,axis = 1)
             
-            if Y[0][0]<0.5:
+            if Y[0][0]<0.5: # Colorbar
                 color_channel = 0
             else:
                 color_channel = 1
                         
-            current_frame[-20:,:int(current_frame.shape[1] * Y[0][0]),color_channel]=255 # You are not taking into account to take the middle frame, now you take the last.
+            current_frame[-20:,:int(current_frame.shape[1] * Y[0][0]),color_channel]=255  # Size of colorbar
             
             print("yey",i, Y)
             

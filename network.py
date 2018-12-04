@@ -149,6 +149,7 @@ def original_networkish(model_path, input_shape):
         model_final = Model(input=rgb_model.input, output=[x])
         model_final.compile(loss = 'binary_crossentropy',optimizer = sgd,
                   metrics=['mae', 'acc'])
+    model_final.summary()
     return model_final
 
 
@@ -179,6 +180,7 @@ def ST_network(model_path, input_shape):
         model_final = Model(input=rgb_model.input, output=[x])
         model_final.compile(loss='binary_crossentropy', optimizer=sgd,
                             metrics=['mae', 'acc'])
+    model_final.summary()
     return model_final
 
 

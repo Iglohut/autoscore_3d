@@ -11,6 +11,7 @@ from keras.layers import BatchNormalization
 from keras.layers import AveragePooling3D
 from keras.layers import Flatten, Average, Activation
 from keras import optimizers
+from keras import backend as K
 from keras.callbacks import ModelCheckpoint
 import os
 
@@ -31,6 +32,8 @@ def get_network_bigger(model_path):
 
     if Path(model_path).exists():
         model_final = load_model(model_path)
+        K.set_value(model_final.optimizer.lr, 0.001)
+        K.set_value(model_final.optimizer.momentum, 0.7)
         print('Loaded existing model')
 
     else:

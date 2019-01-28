@@ -40,11 +40,11 @@ def train():
 
     # Creating or loading model
 #    model_final = get_network(model_path)
-    model_final = get_network_bigger(model_path)
+    model_final = get_network_bigger(model_path, opt='RMSprop')
 #     model_final = noob_network() # Weak model with same input-output to debug
 #    model_final = original_networkish(model_path, (n_frames,) + data["X"].shape[1:])
 #     model_final = ST_network(model_path, (n_frames,) + data["X"].shape[1:])
-
+    
 
     # Metric logger
     logger = Logger(project_path, model_name)

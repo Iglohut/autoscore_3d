@@ -27,13 +27,13 @@ from keras.backend.tensorflow_backend import set_session
 import tensorflow as tf
 
 
-def get_network_bigger(model_path):
+def get_network_bigger(model_path, opt='SGD'):
     input_shape = (None, None, None, 3)
 
     if Path(model_path).exists():
         model_final = load_model(model_path)
-        K.set_value(model_final.optimizer.lr, 0.001)
-        K.set_value(model_final.optimizer.momentum, 0.7)
+#        K.set_value(model_final.optimizer.lr, 0.001)
+#        K.set_value(model_final.optimizer.momentum, 0.7)
         print('Loaded existing model')
 
     else:
@@ -61,10 +61,16 @@ def get_network_bigger(model_path):
         #        x = Lambda(lambda x: x)(x)
         #        x = Reshape((2,), name='Reshape_top')(x)
 
-        sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
         model_final = Model(input=rgb_model.input, output=[x])
-        model_final.compile(loss='binary_crossentropy', optimizer=sgd,
-                            metrics=['mae', 'acc'])
+       
+    if opt == 'SGD':
+        opt_model = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    elif opt == 'RMSprop':
+        opt_model = optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=None, decay=0.0)
+
+        
+    model_final.compile(loss='binary_crossentropy', optimizer=opt_model,
+                        metrics=['mae', 'acc'])
 
     model_final.summary()
     return model_final

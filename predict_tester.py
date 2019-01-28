@@ -65,15 +65,17 @@ n_frames_steps = 3
 # Some paths
 #input_video = '/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space/mouse_training_OS_calcium_1_t0001_raw.avi'
 #input_video = '/home/deeplabchop/src/autoscore_iglo2/mouse_training_OS_5trials_inteldis_59_66_or_206_13_t0001_raw.avi'
-input_video = "/home/deeplabchop/src/autoscore_iglo2/rat_training_OS_baseline_ repeat_2_t0001_raw.avi"
-model_path = "/home/deeplabchop/src/autoscore_iglo2/project/henk_original_checkpoint"
+input_video = "/home/deeplabchop/src/autoscore_iglo2/mouse_training_OS_5trials_inteldis_36_44_or_101_9_t0003_raw.avi"
+#input_video = "/home/deeplabchop/src/autoscore_iglo2/rat_training_OS_baseline_ repeat_2_t0001_raw.avi"
+model_path = "/home/deeplabchop/src/autoscore_iglo2/project/henk_bigger_3frames_checkpoint"
+#model_path = "/home/deeplabchop/src/autoscore_3d/autoscore_model_2"
 data_path ='/home/deeplabchop/src/autoscore_3d/data/data.h5'
 model_final = load_model(model_path)
 print("loaded model")
 
 
 reader = skvideo.io.vreader(input_video)
-vwriter = skvideo.io.FFmpegWriter('/home/deeplabchop/Desktop/vid2_henk_origin.mp4')
+vwriter = skvideo.io.FFmpegWriter('/home/deeplabchop/Desktop/vid_henkbig3_greenOS.mp4')
 
 # Extra stuff
 data = h5py.File(data_path, 'r')
@@ -97,7 +99,9 @@ for i,frame in enumerate(reader):
     
     # Some preprocessing
     frame = im_equalize_hist(baseframe, frame)
-    if input_shape[0] and (not video_shape[1:3] == input_shape): cv2.resize(frame, input_shape)
+#    frame = cv2.resize(frame, (512, 384))
+    frame = cv2.resize(frame.astype("uint8"), (512, 384))
+#    if input_shape[0] and (not video_shape[1:3] == input_shape): cv2.resize(frame, input_shape)
     
     
     

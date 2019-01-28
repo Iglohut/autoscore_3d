@@ -1,0 +1,12 @@
+cd /media/iglohut/MD_Smits/Internship/Intellectual_Disability/Intellectual_Disability
+
+# Get all filenames with raw in file
+find . | grep "raw" > VideoNames.txt
+
+# Delete target lines
+# In one line (\| is OR)
+grep -v ".ffmpeg.log\|habituation\|old\|veryfast\|corrupted\|OS- B5" VideoNames.txt > VideoNames2.txt; mv VideoNames2.txt VideoNames.txt
+
+# To get absolute path
+sudo apt-get install realpath
+realpath LINE

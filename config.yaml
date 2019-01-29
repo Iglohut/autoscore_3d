@@ -14,7 +14,7 @@ resize:
 # NETWORK TRAIN RELATED #
 
 # Data set used for training the network
-dataset: /media/iglohut/Elements/Internship/Autoscore_iglo/Data/old_data/data.h5
+dataset: /media/iglohut/MD_Smits/Internship/autoscore_3d/data/data.h5
 
 model_params:
   # Name of main model to load/train/save

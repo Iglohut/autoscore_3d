@@ -1,7 +1,8 @@
 import pandas as pd
-import numpy as np
 from pathlib import Path
 import re
+import os
+from OS_utils import _vidlength
 
 def name2seq(name):
     """
@@ -23,6 +24,7 @@ def name2subjects(name):
         numbers[-1] = int(str(numbers[0])[0] + str(numbers[-1]))
     return range(numbers[0], numbers[-1]+1)
 
+
 # Create main data frame
 VideoNamesPath = Path("./PredictUtils/VideoNames.txt").resolve()
 VideoNamesSatusPath = str(VideoNamesPath).split('.txt')[0] + "Status.csv"
@@ -42,7 +44,6 @@ for i, row in df.iterrows():
     absname = row.VideoName
     sequence_i = name2seq(absname)
     subjects_i = name2subjects(absname)
-    # subject_i = get_subject_nr(df_help, subjects_i, sequence_i)
 
     df_help_i = df_help.loc[(df_help['subject'].isin(subjects_i))]
     animal_i = df_help_i.loc[df_help_i['sequence_nr'] == sequence_i]
@@ -55,10 +56,12 @@ for i, row in df.iterrows():
         df.at[i, "trial"]= animal_i.trial.values[0]
         df.at[i, "obj_1"] = animal_i.obj_1.values[0]
         df.at[i, "obj_2"] = animal_i.obj_2.values[0]
-
     else:
         df.at[i, "sequence_nr"] = sequence_i
+    vidname_i = os.getcwd().split("autoscore_3d")[0] + "Intellectual_Disability/Intellectual_Disability" + absname[1:]
+    df.at[i,"framelength"] = _vidlength(vidname_i)
 
 
+df.to_csv(VideoNamesSatusPath, index=False)
 
-df.to_csv(VideoNamesSatusPath)
+dff = pd.read_csv("/media/iglohut/MD_Smits/Internship/autoscore_3d/PredictUtils/VideoNamesStatus.csv")

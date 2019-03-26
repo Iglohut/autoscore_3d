@@ -21,8 +21,8 @@ def name2subjects(name):
     numbers = name.split("_t0")[0].split("_")[-2:]
     numbers = [int(re.search(r'\d+', n).group()) for n in numbers]
     if numbers[0] > 100:
-        numbers[-1] = int(str(numbers[0])[0] + str(numbers[-1]))
-    return range(numbers[0], numbers[-1]+1)
+        numbers[-1] = int(numbers[0] + numbers[-1] -1)
+    return range(numbers[0], numbers[-1] + 1)
 
 
 # Create main data frame
@@ -61,7 +61,8 @@ for i, row in df.iterrows():
     vidname_i = os.getcwd().split("autoscore_3d")[0] + "Intellectual_Disability/Intellectual_Disability" + absname[1:]
     df.at[i,"framelength"] = _vidlength(vidname_i)
 
-
 df.to_csv(VideoNamesSatusPath, index=False)
 
 dff = pd.read_csv("/media/iglohut/MD_Smits/Internship/autoscore_3d/PredictUtils/VideoNamesStatus.csv")
+
+

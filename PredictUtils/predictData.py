@@ -1,22 +1,33 @@
-from PredictUtils.utils import im_equalize_hist
 import os
+#os.chdir('/media/deeplabchop/MD_Smits/Internship/autoscore_3d') # For at Marvin
+print(os.getcwd())
+
+import sys
+sys.path.append("..") # Adds higher directory to python modules path
+from PredictUtils.utils import im_equalize_hist
 from keras.models import Model, load_model
 import numpy as np
 import h5py
 import cv2
 from pathlib import Path
 from OS_utils import read_yaml
-import skimage
+import skimage.io
 import skvideo.io
 import pandas as pd
+os.chdir('/media/deeplabchop/MD_Smits/Internship/autoscore_3d') # For at Marvin
+
+# Set GPU (For Marvin)
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+# The GPU id to use, usually either "0" or "1"
+os.environ["CUDA_VISIBLE_DEVICES"]="1" 
 
 
-def autoscore_video(input_video, model_final, baseframe,  n_frames=9, n_frames_steps=3, skipfirst=400, skiplast=400):
+def autoscore_video(input_video, model_final, baseframe,  n_frames=9, n_frames_steps=3, skipfirst=0, skiplast=0):
     # Open video and auxiliary information
     reader = skvideo.io.vreader(input_video)
     # input_shape = tuple(np.shape(model_final.input)[2:4]) # Height and Width
-    video_shape = skvideo.io.FFmpegReader(input_video).getShape()
-    total_frames = video_shape[0]
+#    video_shape = skvideo.io.FFmpegReader(input_video).getShape()
+#    total_frames = video_shape[0]
 
     # One video loop
     frames = []
@@ -30,7 +41,7 @@ def autoscore_video(input_video, model_final, baseframe,  n_frames=9, n_frames_s
         frame = cv2.resize(frame.astype("uint8"), (512, 384))
         #    if input_shape[0] and (not video_shape[1:3] == input_shape): cv2.resize(frame, input_shape)
 
-        if i > skipfirst and i < total_frames - skiplast:  # Predicter loop
+        if True: #i > skipfirst and i < total_frames - skiplast:  # Predicter loop
 
             frames.append(frame)
 
@@ -46,6 +57,7 @@ def autoscore_video(input_video, model_final, baseframe,  n_frames=9, n_frames_s
 
                 # print("yey", i, Y)
                 _ = frames.pop(0)
+    reader.close()
 
     return timeseries
 
@@ -99,7 +111,7 @@ class DataRuler(object):
                 print("Error. Reached the last video.")
                 # self.index -= 1
                 break
-            elif self.df.at[self.index, "StatusPredicted"] == 1:
+            elif self.df.at[self.index, "StatusPredicted"] != 0: # To sometimes handmake status 2: later check if fps=0 go next
                 self.index += 1
 
             elif self.df.at[self.index, "StatusPredicted"] == 0:
@@ -123,7 +135,8 @@ config = read_yaml(Path(os.getcwd()).resolve() / 'config.yaml')
 
 # Load model
 # model_final = load_model("/media/iglohut/MD_Smits/Internship/autoscore_3d/project/henk_bigger_3frames_checkpoint")
-model_final = load_model("/media/iglohut/MD_Smits/Internship/autoscore_3d/project/nepmodel_checkpoint")
+#model_final = load_model("/media/iglohut/MD_Smits/Internship/autoscore_3d/project/nepmodel_checkpoint")
+model_final = load_model("/home/deeplabchop/src/autoscore_iglo2/project/henk_bigger_3frames_checkpoint")
 print("loaded model")
 
 # Load baseframe

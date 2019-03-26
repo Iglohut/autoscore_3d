@@ -10,3 +10,10 @@ grep -v ".ffmpeg.log\|habituation\|old\|veryfast\|corrupted\|OS- B5" VideoNames.
 # To get absolute path
 sudo apt-get install realpath
 realpath LINE
+
+
+
+
+# Copy csv files to specific folder
+find . | grep ".csv" | grep "raw" > PoseFiles.txt
+cat PoseFiles.txt | xargs cp -t "/media/iglohut/MD_Smits/Internship/autoscore_3d/data/ehmt1_poses"

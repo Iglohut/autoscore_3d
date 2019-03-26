@@ -8,7 +8,7 @@ Created on Mon Oct 22 16:41:39 2018
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 # The GPU id to use, usually either "0" or "1"
-os.environ["CUDA_VISIBLE_DEVICES"]="1" 
+os.environ["CUDA_VISIBLE_DEVICES"]="0" 
 import skvideo.io
 import matplotlib.pyplot as plt
 import keras
@@ -66,17 +66,17 @@ n_frames_steps = 3
 # Some paths
 #input_video = '/home/deeplabchop/trifle/homes/evelien/Calcium imaging/32363-32366/Object space/mouse_training_OS_calcium_1_t0001_raw.avi'
 #input_video = '/home/deeplabchop/src/autoscore_iglo2/mouse_training_OS_5trials_inteldis_59_66_or_206_13_t0001_raw.avi'
-input_video = "/home/deeplabchop/src/autoscore_iglo2/mouse_training_OS_5trials_inteldis_36_44_or_101_9_t0003_raw.avi"
+input_video = "/media/deeplabchop/MD_Smits/Internship/Intellectual_Disability/Intellectual_Disability/round_1/originals/mouse_training_OS_5trials_inteldis_1_7animals_t0003_raw.avi"
 #input_video = "/home/deeplabchop/src/autoscore_iglo2/rat_training_OS_baseline_ repeat_2_t0001_raw.avi"
+#model_path = "/home/deeplabchop/src/autoscore_iglo2/project/henk_bigger_3frames_checkpoint"
 model_path = "/home/deeplabchop/src/autoscore_iglo2/project/henk_bigger_3frames_checkpoint"
-#model_path = "/home/deeplabchop/src/autoscore_3d/autoscore_model_2"
 data_path ='/home/deeplabchop/src/autoscore_3d/data/data.h5'
 model_final = load_model(model_path)
 print("loaded model")
 
 
 reader = skvideo.io.vreader(input_video)
-vwriter = skvideo.io.FFmpegWriter('/home/deeplabchop/Desktop/vid_henkbig3_greenOS.mp4')
+vwriter = skvideo.io.FFmpegWriter('/home/deeplabchop/Desktop/vid_henkbig3_round1.mp4')
 
 # Extra stuff
 data = h5py.File(data_path, 'r')

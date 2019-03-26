@@ -22,7 +22,7 @@ def plot(frame):
 
 def showframe(video_name):
     cap = cv2.VideoCapture(str(video_name))
-    frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))k
     cap.set(1, int(frameCount/2))
     ret, frame = cap.read()
     GRAY = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -38,4 +38,6 @@ def showframe(video_name):
 video_name = '/media/iglohut/MD_Smits/Internship/Intellectual_Disability/Intellectual_Disability/round_9/mouse_training_OS_5trials_inteldis_59_66_or_206_13/mouse_training_OS_5trials_inteldis_59_66_or_206_13_t0003_raw.avi'
 showframe(video_name)
 
-# df = pd.read_csv('/media/iglohut/MD_Smits/Internship/autoscore_3d/PredictUtils/BoxLocations.csv', header=[0, 1, 2])
+#df = pd.read_csv('/media/iglohut/MD_Smits/Internship/autoscore_3d/PredictUtils/BoxLocations.csv', header=[0, 1, 2])
+
+# TODO Per vid add width/height such that this has never to be read again...

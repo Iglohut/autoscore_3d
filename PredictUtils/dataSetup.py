@@ -63,6 +63,5 @@ for i, row in df.iterrows():
 
 df.to_csv(VideoNamesSatusPath, index=False)
 
-dff = pd.read_csv("/media/iglohut/MD_Smits/Internship/autoscore_3d/PredictUtils/VideoNamesStatus.csv")
-
+# dff = pd.read_csv("/media/iglohut/MD_Smits/Internship/autoscore_3d/PredictUtils/VideoNamesStatus.csv")
 

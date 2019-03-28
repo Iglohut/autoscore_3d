@@ -118,7 +118,6 @@ def draw_arrow(frame, df, i , config, cat, r):
     return frame
 
 
-
 # Set paths
 vp = '/home/iglohut/OneDrive/RU/Double Internship/Code/MatteoVideos/cropped_m62032-10182018145133-0000.mp4'
 csvp ='/home/iglohut/OneDrive/RU/Double Internship/Code/MatteoVideos/cropped_m62032-10182018145133-0000_WITH-DLC-trained-on-cropped-videos.csv'
@@ -137,16 +136,10 @@ config = {"angle1": {"ref": ["I_Back_drive", "I_Left_drive", "I_Right_drive"],
                      "draw": ["I_Back_drive", "I_Left_drive", "I_Right_drive"], # Draw is the point where to draw the arrow from
                      "colour": {"front":(0, 0, 255),
                                 "alwaysnose": (0, 255, 0),
-                                "visnose": (0, 255, 255)}},
-
-           "angle2": {"ref": ["NI_leftear", "NI_rightear", "NI_BC"],
-                      "points": {'point1': ["NI_nose"]},
-
-                      "draw": ["NI_leftear", "NI_rightear", "NI_BC"],
-
-                      "colour": {"point1": (255, 0, 0)}}}
+                                "visnose": (0, 255, 255)}}}
 
 
+# TODO For ALL csv files, get orientation in the pose-file.
 # Here we write the angles into the dataframe
 for i, cat in enumerate(config):
     for point_ in config[cat]["points"]:
@@ -156,22 +149,24 @@ for i, cat in enumerate(config):
         df[(cat, point_)] = make_angles(df,ref, point)
         df[(cat, point_ + "_likelihood")] = likelihood_point(df, point)
 df.to_csv(csvp_save)
+#
 
-# Here we write the video
-cap = cv2.VideoCapture(str(vp))
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-r = 0.04 * height
-writer = skvideo.io.FFmpegWriter(output_path)
 
-for i in range(_vidlength(vp)):
-    ret, frame = cap.read()
-    if not ret:
-        print("Grab frame unsuccessful. ABORT MISSION!")
-        break
-
-    for _, cat in enumerate(config):
-        frame = draw_arrow(frame, df, i , config, cat, r)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    writer.writeFrame(frame)
-cap.release()
-writer.close()
+# # Here we write the video
+# cap = cv2.VideoCapture(str(vp))
+# height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+# r = 0.04 * height
+# writer = skvideo.io.FFmpegWriter(output_path)
+#
+# for i in range(_vidlength(vp)):
+#     ret, frame = cap.read()
+#     if not ret:
+#         print("Grab frame unsuccessful. ABORT MISSION!")
+#         break
+#
+#     for _, cat in enumerate(config):
+#         frame = draw_arrow(frame, df, i , config, cat, r)
+#     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#     writer.writeFrame(frame)
+# cap.release()
+# writer.close()

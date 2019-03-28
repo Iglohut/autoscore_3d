@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c91c9ff8-0027-4ad3-a212-932d8749c4fd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/PredictFeatures/ShapeHelper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PredictFeatures/OrientationLabeler.py" beforeDir="false" afterPath="$PROJECT_DIR$/PredictFeatures/OrientationLabeler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PredictFeatures/VisualizeBox.py" beforeDir="false" afterPath="$PROJECT_DIR$/PredictFeatures/VisualizeBox.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PredictUtils/ObjectLocationSetup.py" beforeDir="false" afterPath="$PROJECT_DIR$/PredictUtils/ObjectLocationSetup.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -64,8 +60,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PredictFeatures/VisualizeBox.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="261">
-              <caret line="259" column="1" lean-forward="true" selection-start-line="259" selection-start-column="1" selection-end-line="259" selection-end-column="1" />
+            <state relative-caret-position="276">
+              <caret line="65" column="172" selection-start-line="65" selection-start-column="172" selection-end-line="65" selection-end-column="172" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -94,6 +90,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>print</find>
+      <find>_set</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -233,7 +230,7 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32899022" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32899022" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="9" visible="true" weight="0.23235613" />
+      <window_info anchor="bottom" id="Python Console" order="9" visible="true" weight="0.23235613" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.32899022" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -333,8 +330,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PredictFeatures/VisualizeBox.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="261">
-          <caret line="259" column="1" lean-forward="true" selection-start-line="259" selection-start-column="1" selection-end-line="259" selection-end-column="1" />
+        <state relative-caret-position="276">
+          <caret line="65" column="172" selection-start-line="65" selection-start-column="172" selection-end-line="65" selection-end-column="172" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

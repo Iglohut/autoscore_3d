@@ -63,13 +63,10 @@ class BoxTemplate:
         if self.round == 7 and self.trial >= 21:
             self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial_flip"] == 21]
         if self.round == 7 and self.trial < 21:
-            self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial_flip"] == 0]
+            self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial_flip"] == 0] # TODO Flip is in the first 21 trials: 90deg.. delete trials, too hard to control for?
 
 
-        self._set_locradius() # Set per location the radius of detection --> self.full_locations
-
-
-        #TODO get vid round.. maybe select random frame later for illustration purpose
+        self._set_locs() # Set per location the radius of detection --> self.full_locations
 
     def _videodimension(self):
         """Get Dimension of current video (trial)."""
@@ -79,6 +76,7 @@ class BoxTemplate:
         cap.release()
 
     def _grab_midframe(self):
+        "Grabs middle frame for illustration purposes"
         cap = cv2.VideoCapture(self.vidname)
         frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.set(1, int(frameCount / 2))
@@ -88,6 +86,7 @@ class BoxTemplate:
         self.midframe = GRAY
 
     def _boxcolor(self):
+        "Identifies if box is green or white"
         cap = cv2.VideoCapture(self.vidname)
         frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.set(1, int(frameCount / 2))
@@ -101,7 +100,9 @@ class BoxTemplate:
         cap.release()
 
 
-    def _set_locradius(self):
+    def _set_locs(self):
+        """Sets, for pivot each location, the paramaters for its shape where something is detected.
+        self.full_locations"""
         locations = self.df.columns.values[3::2].tolist() # Select columns object/corner/wall and sublocations to iterate over
         self.full_locations = []
         for location in locations: # For every possible mapped location
@@ -181,7 +182,6 @@ class BoxTemplate:
 
     def closest(self, position):
         """
-
         :param position: tuple (x, y) position
         :return: list or name/distance of location closest to
         """
@@ -205,17 +205,20 @@ class BoxTemplate:
         #
         # return distances
 
-    def detect(self, x, y):
+    def detect(self, position):
+        """
+
+        :param position: tuple (x, y) of pixel position of animal
+        :return: the pivot point in which the animal is (if any)
+        """
         pass
     # IF in any radius return
 
     def template(self):
         "Image template of the box"
-        # blank_image = np.zeros((self.height, self.width), np.uint8)
-
-        blank_image = self.midframe
-        overlay = blank_image.copy()
-        output = blank_image.copy()
+        frame = self.midframe
+        overlay = frame.copy()
+        output = frame.copy()
         alpha = 0.8
 
         for location in self.full_locations:
@@ -233,9 +236,9 @@ class BoxTemplate:
 
         # Draw box outline
         cv2.line(output, tuple(self.df["Corner"]["UL"].values[0]), tuple(self.df["Corner"]["UR"].values[0]), color=250, thickness=2)
-        cv2.line(output, tuple(self.df["Corner"]["UL"].values[0]), tuple(self.df["Corner"]["LL"].values[0]), color=250,thickness=2)
-        cv2.line(output, tuple(self.df["Corner"]["LL"].values[0]), tuple(self.df["Corner"]["LR"].values[0]), color=250,thickness=2)
-        cv2.line(output, tuple(self.df["Corner"]["LR"].values[0]), tuple(self.df["Corner"]["UR"].values[0]), color=250,thickness=2)
+        cv2.line(output, tuple(self.df["Corner"]["UL"].values[0]), tuple(self.df["Corner"]["LL"].values[0]), color=250, thickness=2)
+        cv2.line(output, tuple(self.df["Corner"]["LL"].values[0]), tuple(self.df["Corner"]["LR"].values[0]), color=250, thickness=2)
+        cv2.line(output, tuple(self.df["Corner"]["LR"].values[0]), tuple(self.df["Corner"]["UR"].values[0]), color=250, thickness=2)
 
         cv2.addWeighted(overlay, alpha, output, 1 - alpha, 0, output)
 
@@ -250,12 +253,12 @@ class BoxTemplate:
 df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
 df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
 
-myvid = df["VideoName"][2000]
+myvid = df["VideoName"][450]
 temp = BoxTemplate(myvid)
 
 temp.df
 
-temp._set_locradius()
+temp._set_locs()
 
 #
 # blank_image = np.zeros((300, 300), np.uint8)

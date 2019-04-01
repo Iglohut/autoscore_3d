@@ -3,11 +3,6 @@ import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
 import PredictFeatures.ShapeHelper as PS
-import cv2
-
-df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
-df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv')
-
 from sklearn.cluster import KMeans
 from collections import Counter
 import cv2  # for resizing image
@@ -25,7 +20,7 @@ def get_dominant_color(image, k=4, image_processing_size=None):
     this resizing can be done with the image_processing_size param
     which takes a tuple of image dims as input
 
-    >>> get_dominant_color(my_image, k=4, image_processing_size = (25, 25))
+    # >>> get_dominant_color(my_image, k=4, image_processing_size = (25, 25))
     [56.2423442, 34.0834233, 70.1234123]
     """
     # resize image if new dims provided
@@ -55,18 +50,19 @@ class BoxTemplate:
         self.round = int(video_path[video_path.find('round')+6]) # Round number
         self.trial = int(myvid.split("_t0")[-1].split("_")[0])  # Trial number - because the camera flip...
         self._videodimension() # Set dimension of box
-        self._grab_midframe() # Get a frame
+        self._grab_midframe() # Get a frame grayscale
         self._boxcolor()
 
+        # Select correct template
         self.df = self.df_boxloc.loc[self.df_boxloc["Round"]["Round"]["Round"] == self.round] # Select BoxLocations of this round
         self.df = self.df[self.df["BoxColor"]["BoxColor"]["BoxColor"] == self.boxcolor]
         if self.round == 7 and self.trial >= 21:
-            self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial_flip"] == 21]
+            self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial"] == 21]
         if self.round == 7 and self.trial < 21:
-            self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial_flip"] == 0] # TODO Flip is in the first 21 trials: 90deg.. delete trials, too hard to control for?
-
+            self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial"] == 0]
 
         self._set_locs() # Set per location the radius of detection --> self.full_locations
+
 
     def _videodimension(self):
         """Get Dimension of current video (trial)."""
@@ -99,11 +95,42 @@ class BoxTemplate:
         self.boxcolor = color
         cap.release()
 
+    def _rotate_result(self, closest_area):
+        """
+
+        :param degrees: degrees as quadrant moves: [0 , 1,  2,  3] = [0, 90, 180, 270]
+        :return:
+        """
+        # pass
+        walls = ["North", "East", "South", "West"]
+        corners = ["UR", "LR", "LL", "UL"]
+        indices = [0, 1, 2, 3] * 3
+        degrees = int(self.df["Trial_flip"]["Trial_flip"]["Degrees"].values[0])
+
+        distance = closest_area[0]
+        superlocation = closest_area[1]
+        sublocation = closest_area[2]
+
+        if superlocation == "Wall":
+            idx = walls.index(sublocation)
+            idx += degrees # new idx
+            new_sublocation = walls[indices[idx]]
+        elif superlocation in ["Corner", "Object"]:
+            idx = corners.index(sublocation)
+            idx += degrees # new idx
+            new_sublocation = corners[indices[idx]]
+
+        return (distance, superlocation, new_sublocation)
+
+
+
+
+
 
     def _set_locs(self):
         """Sets, for pivot each location, the paramaters for its shape where something is detected.
         self.full_locations"""
-        locations = self.df.columns.values[3::2].tolist() # Select columns object/corner/wall and sublocations to iterate over
+        locations = self.df.columns.values[4::2].tolist() # Select columns object/corner/wall and sublocations to iterate over
         self.full_locations = []
         for location in locations: # For every possible mapped location
             superlocation = location[0] # Object/Corner/Wall
@@ -185,34 +212,40 @@ class BoxTemplate:
         :param position: tuple (x, y) position
         :return: list or name/distance of location closest to
         """
-        pass
-        # locations = self.df.columns.values[2::2].tolist() # Select columns object/corner/wall and sublocations to iterate over
-        #
-        # distances = []
-        # for location in locations: # For every possible mapped location
-        #     superlocation = location[0] # Object/Corner/Wall
-        #     sublocation = location[1] # Left/West etc
-        #     area_position = self.df[superlocation][sublocation] # x,y coordinates
-        #
-        #     distance = np.linalg.norm(area_position - position) # L2 norm distance
-        #
-        #
-        #     # This sets a radius for both the object and corner
-        #
-        #
-        #
-        #     distances.append((distance, superlocation, sublocation))
-        #
-        # return distances
+        distances = []
+        for location in self.full_locations:
+            superlocation = location[0]
+            sublocation = location[1]
+            area_position = self.df[superlocation][sublocation].values[0]  # x,y coordinates
+
+            if superlocation == "Wall": # Check if in rectangle
+                rectangle = location[2]
+                point = PS.Point(position[0], position[1])
+
+                distance = int(not rectangle.contains(point)) * self.width/2 # Jus tto make it arbitrary positive if not in rectangle
+
+            else: # Check distance from circles
+                radius = location[2]
+                distance = abs(np.linalg.norm(area_position - position)) - radius # L2 norm distance
+
+            distances.append((distance, superlocation, sublocation))
+
+        closest_area = min(distances)
+
+        return self._rotate_result(closest_area)
+
 
     def detect(self, position):
         """
-
         :param position: tuple (x, y) of pixel position of animal
         :return: the pivot point in which the animal is (if any)
         """
-        pass
-    # IF in any radius return
+        closest_pivot = self.closest(position)
+        distance = closest_pivot[0]
+        if distance <= 0:
+            return closest_pivot[1:]
+        else:
+            return None
 
     def template(self):
         "Image template of the box"
@@ -226,11 +259,11 @@ class BoxTemplate:
             sublocation = location[1]
             area_position = tuple(self.df[superlocation][sublocation].values[0])  # x,y coordinates
 
-            if superlocation == "Wall":
+            if superlocation == "Wall": # Draw wall rectangles
                 rectangle = location[2]
                 pt1, pt2 = rectangle.points()
                 cv2.rectangle(overlay, pt1, pt2, color=150, thickness=-1)
-            else:
+            else: # Draw point circles
                 radius = location[2]
                 cv2.circle(overlay, area_position, radius=int(radius), color=150, thickness=-1)
 
@@ -248,34 +281,25 @@ class BoxTemplate:
     def __call__(self):
         pass
 
+    def __len__(self):
+        return len(self.full_locations)
+
 
 
 df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
 df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
 
-myvid = df["VideoName"][450]
+myvid = df["VideoName"][1770]
 temp = BoxTemplate(myvid)
 
 temp.df
 
 temp._set_locs()
-
-#
-# blank_image = np.zeros((300, 300), np.uint8)
-# overlay = blank_image.copy()
-# output = blank_image.copy()
-#
-# alpha = 0.2
-# cv2.circle(overlay, (150,150), radius=30, color=150 , thickness=-1)
-# cv2.addWeighted(overlay, alpha, output, 1 - alpha, 0, output)
-#
-# # show the output image
-# print("alpha={}, beta={}".format(alpha, 1 - alpha))
-# cv2.imshow("Output", output)
-# cv2.waitKey(0)
 temp.template()
 
 
 cv2.imshow('Templateee', temp.template)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+temp.closest([300,300])

@@ -49,8 +49,8 @@ class BoxTemplate:
         self.vidname = os.getcwd().split("autoscore_3d")[0] + "Intellectual_Disability/Intellectual_Disability" + video_path[1:]
         self.round = int(video_path[video_path.find('round')+6]) # Round number
         self.trial = int(myvid.split("_t0")[-1].split("_")[0])  # Trial number - because the camera flip...
-        self._videodimension() # Set dimension of box
         self._grab_midframe() # Get a frame grayscale
+        self._videodimension() # Set dimension of box
         self._boxcolor()
 
         # Select correct template
@@ -61,7 +61,16 @@ class BoxTemplate:
         if self.round == 7 and self.trial < 21:
             self.df = self.df[self.df["Trial_flip"]["Trial_flip"]["Trial"] == 0]
 
+        self._correct_shapes_overengineered() # Correct for camera changes scale.. :\
+
         self._set_locs() # Set per location the radius of detection --> self.full_locations
+
+    def _correct_shapes_overengineered(self):
+        """Re-scale the location positions according to video. This is because scorer32 allows for rescale-saving and thus inconsistent shape of videos."""
+        if self.round in [8, 9] and self.width != 640:  # Round 8/9 meta: because scorer32 allows scaling
+            locations = self.df.columns.values[4::].tolist()  # Select columns object/corner/wall and sublocations to iterate over
+            for location in locations:  # For every possible mapped location
+                self.df.loc[:, location] = int(self.df.loc[:, location].values[0] * (self.width / 640)) # rescale locations
 
 
     def _videodimension(self):
@@ -70,6 +79,7 @@ class BoxTemplate:
         self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) # float
         self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
         cap.release()
+
 
     def _grab_midframe(self):
         "Grabs middle frame for illustration purposes"
@@ -88,7 +98,8 @@ class BoxTemplate:
         cap.set(1, int(frameCount / 2))
         ret, frame = cap.read()
         clt = get_dominant_color(frame)
-        if clt[1] > np.mean(clt) + np.std(clt):
+        not_green = clt[::len(clt)-1]
+        if clt[1] > np.mean(not_green) + np.std(not_green) and np.std(not_green) > 20:
             color = "Green"
         else:
             color = "White"
@@ -121,11 +132,6 @@ class BoxTemplate:
             new_sublocation = corners[indices[idx]]
 
         return (distance, superlocation, new_sublocation)
-
-
-
-
-
 
     def _set_locs(self):
         """Sets, for pivot each location, the paramaters for its shape where something is detected.
@@ -242,7 +248,10 @@ class BoxTemplate:
         """
         closest_pivot = self.closest(position)
         distance = closest_pivot[0]
+        object_detection_error = 25 # in normalized pixels
         if distance <= 0:
+            return closest_pivot[1:]
+        elif closest_pivot[1] == "Object" and distance <= object_detection_error:
             return closest_pivot[1:]
         else:
             return None
@@ -250,6 +259,7 @@ class BoxTemplate:
     def template(self):
         "Image template of the box"
         frame = self.midframe
+        # frame = np.zeros((self.height, self.width)) # Because cv2 transposes it
         overlay = frame.copy()
         output = frame.copy()
         alpha = 0.8
@@ -287,9 +297,9 @@ class BoxTemplate:
 
 
 df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
-df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
+# df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
 
-myvid = df["VideoName"][1770]
+myvid = df["VideoName"][3400]
 temp = BoxTemplate(myvid)
 
 temp.df
@@ -302,4 +312,8 @@ cv2.imshow('Templateee', temp.template)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-temp.closest([300,300])
+# temp.closest([300,300])
+
+temp.closest([154, 254])
+
+

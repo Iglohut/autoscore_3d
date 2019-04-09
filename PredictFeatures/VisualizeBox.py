@@ -48,7 +48,7 @@ class BoxTemplate:
     def __init__(self, video_path):
         self.vidname = os.getcwd().split("autoscore_3d")[0] + "Intellectual_Disability/Intellectual_Disability" + video_path[1:]
         self.round = int(video_path[video_path.find('round')+6]) # Round number
-        self.trial = int(myvid.split("_t0")[-1].split("_")[0])  # Trial number - because the camera flip...
+        self.trial = int(video_path.split("_t0")[-1].split("_")[0])  # Trial number - because the camera flip...
         self._grab_midframe() # Get a frame grayscale
         self._videodimension() # Set dimension of box
         self._boxcolor()
@@ -296,24 +296,24 @@ class BoxTemplate:
 
 
 
-df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
-# df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
-
-myvid = df["VideoName"][3400]
-temp = BoxTemplate(myvid)
-
-temp.df
-
-temp._set_locs()
-temp.template()
-
-
-cv2.imshow('Templateee', temp.template)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-# temp.closest([300,300])
-
-temp.closest([154, 254])
+# df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
+# # df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
+#
+# myvid = df["VideoName"][3400]
+# temp = BoxTemplate(myvid)
+#
+# temp.df
+#
+# temp._set_locs()
+# temp.template()
+#
+#
+# cv2.imshow('Templateee', temp.template)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+#
+# # temp.closest([300,300])
+#
+# temp.closest([154, 254])
 
 

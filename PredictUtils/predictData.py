@@ -98,7 +98,7 @@ class DataRuler(object):
         self.df.at[self.index, "StatusPredicted"] = new_status
         self.df.to_csv(self.VideoNamesStatusPath, index=False)
 
-    def goto_first_unprecited_video(self):
+    def goto_first_unpredicted_video(self):
         old_index = self.index + 0
         self.index = self.df[self.df.StatusPredicted == 0].index[0]
         if self.index == old_index: print("Did not move to the next video. Did you update the status?")

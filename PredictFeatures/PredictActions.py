@@ -177,17 +177,16 @@ class IconFrame():
             self.new_frame[y1:y2, x1:x2, c] = (alpha_s * overlay[:, :, c] +
                                       alpha_l * self.new_frame[y1:y2, x1:x2, c])
 
-
     def embed_icons(self, action = None):
+        """embeds all icons on frame, but only makes the one that has an action salient."""
         dimensions = np.array(np.array(self.frame.shape))[0:2]
-
 
         chosen_wall = 0
         chosen_object = 0
         chosen_corner = 0
         if action == "Wall":
             chosen_wall = 1
-        if action == "Object":
+        if action in ["Object", "obj_1", "obj_2"]:
             chosen_object = 1
         if action == "Corner":
             chosen_corner = 1
@@ -196,7 +195,6 @@ class IconFrame():
         self.embed_icon(self.wall, int(dimensions[1] * 0.3), y_loc, chosen_wall)
         self.embed_icon(self.corner, int(dimensions[1] * 0.15), y_loc, chosen_corner)
         self.embed_icon(self.explore, int(dimensions[1] * 0.01), y_loc, chosen_object)
-
 
 
     def __call__(self):
@@ -213,3 +211,5 @@ myframe.embed_icons("Object")
 cv2.imshow('Templateee', myframe())
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+# TODO automatic vidoemaker with limbs, actions ;; use parts of OrientationLabeler

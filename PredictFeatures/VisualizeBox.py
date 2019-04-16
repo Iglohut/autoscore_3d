@@ -146,11 +146,11 @@ class BoxTemplate:
             if superlocation == "Object":
                 radius = int(np.linalg.norm(area_position - self.df["Corner"][sublocation]) / 2)
             elif superlocation == "Corner":
-                radius = int(np.linalg.norm(area_position - self.df["Object"][sublocation]) / 2)
+                radius = int(np.linalg.norm(area_position - self.df["Object"][sublocation]) / 2.9)
             elif superlocation == "Wall": # Wall are represented as rectangles!
-                wall_length = 4
-                wall_width = 3
-                sidewall_extension = 3
+                wall_length = 12
+                wall_width = 4
+                sidewall_extension = 300
                 if sublocation == "North":
                     dx =abs(self.df["Corner"]["UR"]['x'].values[0] - self.df["Corner"]["UL"]['x'].values[0])
 
@@ -159,7 +159,7 @@ class BoxTemplate:
 
                     dy = abs((self.df["Corner"]["UR"]['y'].values[0] - self.df["Object"]["UL"]['y'].values[0]))
                     y1 = self.df["Corner"]["UR"]['y'].values[0] + dy / wall_width
-                    y2 = self.df["Corner"]["UR"]['y'].values[0] - dy / wall_width
+                    y2 = self.df["Corner"]["UR"]['y'].values[0] - sidewall_extension * dy / wall_width
 
                 elif sublocation == "South":
                     dx = abs(self.df["Corner"]["LR"]['x'].values[0] - self.df["Corner"]["LL"]['x'].values[0])
@@ -168,7 +168,7 @@ class BoxTemplate:
                     x2 = self.df["Corner"]["LR"]['x'].values[0] - dx / wall_length
 
                     dy = abs((self.df["Corner"]["LR"]['y'].values[0] - self.df["Object"]["LL"]['y'].values[0]))
-                    y1 = self.df["Corner"]["LR"]['y'].values[0] + dy / wall_width
+                    y1 = self.df["Corner"]["LR"]['y'].values[0] + sidewall_extension * dy / wall_width
                     y2 = self.df["Corner"]["LR"]['y'].values[0] - dy / wall_width
 
                 elif sublocation == "East":
@@ -295,11 +295,11 @@ class BoxTemplate:
         return len(self.full_locations)
 
 
-
+# # TODO increase wall length, not thickness ;;; corner smaller?
 # df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
 # # df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
 #
-# myvid = df["VideoName"][3400]
+# myvid = df["VideoName"][1200]
 # temp = BoxTemplate(myvid)
 #
 # temp.df

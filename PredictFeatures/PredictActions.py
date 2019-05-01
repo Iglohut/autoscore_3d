@@ -10,17 +10,25 @@ class SequenceExtracter():
     def __init__(self, vidnumber):
         self.df = self.df_all.iloc[vidnumber] # Dataframe with trial information
 
-        if self.canalyze:
-            self.template = BoxTemplate(self.df.VideoName) # Get the BoxTemplate
-            self.df_pose = pd.read_csv(self.posefile, header=[0, 1], skipinitialspace=True)
-        else:
-            print("My apologies, this video was not analyzed by autoscore and DLC. Video({}):".format(vidnumber), self.df.VideoName)
-
+        # The action list for all frames
         self.ActionSequence = {
             "pivot_locations": [],
             "autoscores": [],
             "actions": []
         }
+
+
+        if self.canalyze:
+            self.template = BoxTemplate(self.df.VideoName) # Get the BoxTemplate
+            self.df_pose = pd.read_csv(self.posefile, header=[0, 1], skipinitialspace=True)
+
+            self.headPoints = self.calc_headPoints # precalculate all headpoints to speed up loops
+            self.headDirections = list(self.df_pose[("angle1" , "Nose")])
+            self.ActionSequence['autoscores'] = self.set_autoscores
+
+
+        else:
+            print("My apologies, this video was not analyzed by autoscore and DLC. Video({}):".format(vidnumber), self.df.VideoName)
 
     @property
     def canalyze(self):
@@ -48,13 +56,41 @@ class SequenceExtracter():
         myposefile = posedir + "/" + myposefile[0]
         return myposefile
 
+    @property
+    def autoscorefile(self):
+        """Returns thge autoscore estimation path of the current video"""
+        dir = os.getcwd() + '/data/ehmt1/ehmt1_autoscores'
+        files = os.listdir(dir)
+        myfile = [file for file in files if self.df.VideoName.split('/')[-1].split('.')[0] in file]
+        myfile = dir + "/" + myfile[0]
+        return myfile
+
+    @property
+    def set_autoscores(self):
+        """Returns for all frames decision exploring object or not"""
+        df = pd.read_csv(self.autoscorefile)
+        df = list(df["Explore"])
+        df = list(np.zeros(27)) + df # Because autoscore used windows of 27frames
+        return df
+
+    @property
+    def calc_headPoints(self):
+        xs = self.df_pose[[("Nose", "x"), ("Left ear", "x"), ("Right  ear", "x")]].mean(axis=1)
+        ys = self.df_pose[[("Nose", "y"), ("Left ear", "y"), ("Right  ear", "y")]].mean(axis=1)
+
+        return {'x': list(xs),
+                'y': list(ys)
+                }
+
     def headPoint(self, frame_idx):
         """
         :param frame_idx: index of frame in video/posefile
         :return: tuple pixel position of head
         """
-        x = int(self.df_pose.loc[frame_idx, [("Nose", "x"), ("Left ear", "x"), ("Right  ear", "x")]].mean())
-        y = int(self.df_pose.loc[frame_idx, [("Nose", "y"), ("Left ear", "y"), ("Right  ear", "y")]].mean())
+        # x = int(self.df_pose.loc[frame_idx, [("Nose", "x"), ("Left ear", "x"), ("Right  ear", "x")]].mean())
+        # y = int(self.df_pose.loc[frame_idx, [("Nose", "y"), ("Left ear", "y"), ("Right  ear", "y")]].mean())
+        x = self.headPoints['x'][frame_idx]
+        y = self.headPoints['y'][frame_idx]
         return (x, y)
 
     def headDirection(self, frame_idx):
@@ -63,7 +99,8 @@ class SequenceExtracter():
         :param frame_idx: index of frame in video/posefile
         :return: head direction in radians
         """
-        HD = self.df_pose.loc[frame_idx, ("angle1", "Nose")]
+        # HD = self.df_pose.loc[frame_idx, ("angle1", "Nose")]
+        HD = self.headDirections[frame_idx]
         flips = self.template.df["Trial_flip"]["Trial_flip"]["Degrees"].values[0] # Clockwise flips
         if np.sign(HD) == -1:
             HD += 2 * np.pi
@@ -81,6 +118,7 @@ class SequenceExtracter():
         """
         pivot_locations = []
         for i in range(len(self)): # for all estimated frames
+            print("Get pivot locations: {}/{}".format(i, len(self)))
             position = self.headPoint(i)
             location = self.template.detect(position)
             pivot_locations.append(location)
@@ -96,7 +134,7 @@ class SequenceExtracter():
             print("There's no pivot locations yet.")
             pass
 
-
+        # TODO allow multiple actions
         actions = []
         for i, pivot in enumerate(self.ActionSequence["pivot_locations"]):
             action = None
@@ -158,7 +196,7 @@ class SequenceExtracter():
             return None
 
 
-myvid = SequenceExtracter(3093) # 2530 round8, 1670 round 7 norot,
+myvid = SequenceExtracter(2701) # 2530 round8, 1670 round 7 norot,
 
 
 # myframe = IconFrame(myvid.template.midframe)

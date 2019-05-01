@@ -295,11 +295,11 @@ class BoxTemplate:
         return len(self.full_locations)
 
 
-# # TODO increase wall length, not thickness ;;; corner smaller?
+# # # TODO increase wall length, not thickness ;;; corner smaller?
 # df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
 # # df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
 #
-# myvid = df["VideoName"][1200]
+# myvid = df["VideoName"][2700]
 # temp = BoxTemplate(myvid)
 #
 # temp.df
@@ -309,9 +309,10 @@ class BoxTemplate:
 #
 #
 # cv2.imshow('Templateee', temp.template)
+# cv2.imwrite('/media/iglohut/Iglohut/BoxTemplate_example.png',temp.template)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
-#
+
 # # temp.closest([300,300])
 #
 # temp.closest([154, 254])

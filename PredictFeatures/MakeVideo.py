@@ -26,16 +26,25 @@ class IconFrame():
         if len(frame.shape) == 3:
             return frame
         else:
-            return cv2.cvtColor(frame,cv2.COLOR_GRAY2RGB)
+            return cv2.cvtColor(frame, cv2.COLOR_GRAY2RGB)
 
     def embed_icon(self, overlay, x_offset, y_offset, chosen = 0):
         """Embed single icon on frame"""
         y1, y2 = y_offset, y_offset + overlay.shape[0]
         x1, x2 = x_offset, x_offset + overlay.shape[1]
-
-
         if chosen == 0: alpha = 700
-        if chosen == 1: alpha =255
+        if chosen == 1:
+            alpha =255
+            # Change color of icon
+            old_alpha = overlay[:, :, 3].copy()
+            if (overlay == self.wall).all(): # Change color to orange
+                overlay[(np.where(overlay[:, :, 3] > 0))] = [0, 33, 166, 255]
+            elif (overlay == self.corner).all():
+                overlay[(np.where(overlay[:, :, 3] > 0))] = [0, 0, 139, 255]
+            elif (overlay == self.explore).all():
+                overlay[(np.where(overlay[:, :, 3] > 0))] = [205, 0, 0, 255]
+            overlay[:, :, 3] = old_alpha
+
         alpha_s = overlay[:, :, 3] / alpha
         alpha_l = 1.0 - alpha_s
 
@@ -43,19 +52,24 @@ class IconFrame():
             self.new_frame[y1:y2, x1:x2, c] = (alpha_s * overlay[:, :, c] +
                                       alpha_l * self.new_frame[y1:y2, x1:x2, c])
 
-    def embed_icons(self, action = None):
+
+
+    def embed_icons(self, actions = None):
         """embeds all icons on frame, but only makes the one that has an action salient."""
         dimensions = np.array(np.array(self.frame.shape))[0:2]
+
+        if type(actions) is not list: actions = [actions]
 
         chosen_wall = 0
         chosen_object = 0
         chosen_corner = 0
-        if action == "Wall":
-            chosen_wall = 1
-        if action in ["Object", "obj_1", "obj_2"]:
-            chosen_object = 1
-        if action == "Corner":
-            chosen_corner = 1
+        for action in actions:
+            if action in ["Wall"]:
+                chosen_wall = 1
+            if action in ["Object", "obj_1", "obj_2"]:
+                chosen_object = 1
+            if action in ["Corner"]:
+                chosen_corner = 1
 
         y_loc = int(dimensions[0] * 0.01)
         self.embed_icon(self.wall, int(dimensions[1] * 0.3), y_loc, chosen_wall)
@@ -183,3 +197,14 @@ config = {"angle1": {"ref": ["Right  ear", "Left ear", "Back"],
                      "points": {'Nose': ["Nose"]},
                      "draw": ["Right  ear", "Left ear", "Back"],
                      "colour": {'Nose': (71, 99, 255)}}}
+
+
+
+# frame = cv2.imread('/media/iglohut/Iglohut/BoxTemplate_example1.png')
+# myframe = IconFrame(frame)
+# myframe.embed_icons(['Object', "Wall"])
+#
+# cv2.imshow('icons', myframe())
+#
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()

@@ -64,7 +64,7 @@ class IconFrame():
         chosen_object = 0
         chosen_corner = 0
         for action in actions:
-            if action in ["Wall"]:
+            if action in ["Wall", 'wall']:
                 chosen_wall = 1
             if action in ["Object", "obj_1", "obj_2"]:
                 chosen_object = 1
@@ -180,11 +180,19 @@ def make_video(SequenceObject):
         myframe = IconFrame(frame)
         myframe.embed_icons(actions[i])
 
+
         # # text debug headDirection
         # y = int(height / 2)
         # x = int(0)
         # text =str("HeadDirection: {:.4}".format(SequenceObject.headDirection(i)))
-        # cv2.putText(myframe(), text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), thickness=2)
+        # cv2.putText(myframe(), text, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), thickness=2)
+
+        # Print frame nr
+        y = int(height/15)
+        x = int(width * 0.8)
+        cv2.putText(myframe(), str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), thickness=2)
+
+
 
 
         frame = cv2.cvtColor(myframe(), cv2.COLOR_BGR2RGB)
@@ -202,9 +210,10 @@ config = {"angle1": {"ref": ["Right  ear", "Left ear", "Back"],
 
 # frame = cv2.imread('/media/iglohut/Iglohut/BoxTemplate_example1.png')
 # myframe = IconFrame(frame)
-# myframe.embed_icons(['Object', "Wall"])
+# myframe.embed_icons(["Wall"])
 #
 # cv2.imshow('icons', myframe())
 #
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
+#

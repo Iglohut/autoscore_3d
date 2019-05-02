@@ -87,8 +87,6 @@ class SequenceExtracter():
         :param frame_idx: index of frame in video/posefile
         :return: tuple pixel position of head
         """
-        # x = int(self.df_pose.loc[frame_idx, [("Nose", "x"), ("Left ear", "x"), ("Right  ear", "x")]].mean())
-        # y = int(self.df_pose.loc[frame_idx, [("Nose", "y"), ("Left ear", "y"), ("Right  ear", "y")]].mean())
         x = self.headPoints['x'][frame_idx]
         y = self.headPoints['y'][frame_idx]
         return (x, y)
@@ -120,7 +118,7 @@ class SequenceExtracter():
         for i in range(len(self)): # for all estimated frames
             print("Get pivot locations: {}/{}".format(i, len(self)))
             position = self.headPoint(i)
-            location = self.template.detect(position)
+            location = self.template.detect(position, self.ActionSequence["autoscores"][i])
             pivot_locations.append(location)
 
         self.ActionSequence["pivot_locations"] = pivot_locations
@@ -128,41 +126,43 @@ class SequenceExtracter():
 
     def get_actions(self):
         """
-        Calculated the actions based on DLC location, template, and autoscore (to be implemented).
+        Calculates the actions based on DLC location, template, and autoscore (to be implemented).
         """
         if len(self.ActionSequence["pivot_locations"]) == 0:
             print("There's no pivot locations yet.")
             pass
 
-        # TODO allow multiple actions: e.g. wall and corner; so also action seqeuence and then this..
-        actions = []
-        for i, pivot in enumerate(self.ActionSequence["pivot_locations"]):
-            action = None
-            if pivot is not None:
-                superlocation = pivot[0]
-                sublocation = pivot[1]
+        all_actions = []
+        for i, pivots in enumerate(self.ActionSequence["pivot_locations"]):
+            frame_actions = []
+            for pivot in pivots:
+                if pivot is not None:
+                    superlocation = pivot[0]
+                    sublocation = pivot[1]
 
-                if superlocation == "Wall" and self._check_wall(sublocation, i):
-                    action = "Wall"
+                    if superlocation == "Wall" and self._check_wall(sublocation, i):
+                        frame_actions.append("Wall")
 
-                if superlocation == "Object": # TODO combine with autoscore
-                    if sublocation == self.df.obj_1:
-                        action = "obj_1"
-                    if sublocation == self.df.obj_2:
-                        action = "obj_2"
+                    if superlocation == "Object":
+                        if sublocation == self.df.obj_1:
+                            frame_actions.append('obj_1')
+                        if sublocation == self.df.obj_2:
+                            frame_actions.append('obj_2')
 
-                if superlocation == "Corner":
-                    action = "Corner"
+                    if superlocation == "Corner":
+                        frame_actions.append('Corner')
 
-            actions.append(action)
-        self.ActionSequence["actions"] = actions
+            if len(frame_actions) == 0: frame_actions = [None]
+            all_actions.append(frame_actions)
+        self.ActionSequence["actions"] = all_actions
+
 
 
     def _check_wall(self, sublocation, frame_idx):
         HD = self.headDirection(frame_idx)
         if sublocation == "North" and HD > 1 * np.pi / 10  and HD < 9 * np.pi / 10:
             return True
-        elif sublocation == "East" and bool(HD < 4 * np.pi / 10 and not HD < -4 * np.pi / 10) ^ bool(HD > - 4 * np.pi / 10 and not HD > 4 * np.pi / 10): # ^ is XOR
+        elif sublocation == "East" and bool(HD < 4 * np.pi / 10 and not HD < -4 * np.pi / 10): # ^ is XOR
             return True
         elif sublocation == "South" and HD < -1 * np.pi / 10 and HD > - 9 * np.pi / 10:
             return True
@@ -212,4 +212,8 @@ myvid = SequenceExtracter(2701) # 2530 round8, 1670 round 7 norot,
 myvid.get_pivot_locations()
 myvid.get_actions()
 myvid.make_video()
+
+
+# for i in range(len(myvid.ActionSequence["actions"])):
+#     print(myvid.ActionSequence["actions"][i], i, myvid.ActionSequence["pivot_locations"][i], myvid.headPoint(i))
 

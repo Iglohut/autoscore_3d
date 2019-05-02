@@ -148,7 +148,7 @@ class BoxTemplate:
             elif superlocation == "Corner":
                 radius = int(np.linalg.norm(area_position - self.df["Object"][sublocation]) / 2.9)
             elif superlocation == "Wall": # Wall are represented as rectangles!
-                wall_length = 12 # TODO Make wall full length and overlap with corner
+                wall_length = 500 # TODO Make wall full length and overlap with corner
                 wall_width = 4
                 sidewall_extension = 300
                 if sublocation == "North":
@@ -213,7 +213,7 @@ class BoxTemplate:
 
             self.full_locations.append((superlocation, sublocation, radius))
 
-    def closest(self, position):
+    def in_pivots(self, position, autoscore_correct=0):
         """
         :param position: tuple (x, y) position
         :return: list or name/distance of location closest to
@@ -234,27 +234,31 @@ class BoxTemplate:
                 radius = location[2]
                 distance = abs(np.linalg.norm(area_position - position)) - radius # L2 norm distance
 
-            distances.append(self._rotate_result((distance, superlocation, sublocation)))
 
-        closest_area = min(distances)
-
-        return closest_area
+            distances.append((distance, superlocation, sublocation))
 
 
-    def detect(self, position):
+        # closest_area = min(distances)
+        # # areas = self._rotate_result(closest_area)
+        #
+        # areas = [self._rotate_result(distance) for distance in distances if distance[0] < 25]
+        object_detection_error = autoscore_correct * 25  # in normalized pixels;  control for autoscore!
+        # in_pivots = [pivot[1:] for pivot in distances if pivot[0] <= (0 + int(pivot[1] == "Object") * object_detection_error)]
+        in_pivots = [self._rotate_result(pivot)[1:] for pivot in distances if pivot[0] <= (0 + int(pivot[1] == "Object") * object_detection_error)]
+
+        return in_pivots
+
+
+    def detect(self, position, autoscore_correct=0):
         """
         :param position: tuple (x, y) of pixel position of animal
         :return: the pivot point in which the animal is (if any)
         """
-        closest_pivot = self.closest(position)
-        distance = closest_pivot[0]
-        object_detection_error = 25 # in normalized pixels
-        if distance <= 0:
-            return closest_pivot[1:]
-        elif closest_pivot[1] == "Object" and distance <= object_detection_error:
-            return closest_pivot[1:]
-        else:
-            return None
+        pivots = self.in_pivots(position, autoscore_correct)
+        if len(pivots) == 0:
+            return [None]
+        return pivots
+
 
     def template(self):
         "Image template of the box"
@@ -295,26 +299,27 @@ class BoxTemplate:
         return len(self.full_locations)
 
 
-# # # TODO increase wall length, not thickness ;;; corner smaller?
+
 # df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
-# # df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
-#
-# myvid = df["VideoName"][2700]
+# # # df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
+# #
+# myvid = df["VideoName"][2701]
 # temp = BoxTemplate(myvid)
 #
 # temp.df
 #
 # temp._set_locs()
 # temp.template()
-#
-#
+# #
+# #
 # cv2.imshow('Templateee', temp.template)
-# cv2.imwrite('/media/iglohut/Iglohut/BoxTemplate_example.png',temp.template)
+# # cv2.imwrite('/media/iglohut/Iglohut/BoxTemplate_example.png',temp.template)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
-
-# # temp.closest([300,300])
 #
-# temp.closest([154, 254])
-
+# #
+#
+#
+# temp.detect([83, 238])
+#
 

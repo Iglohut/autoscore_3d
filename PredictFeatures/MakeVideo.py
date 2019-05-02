@@ -190,7 +190,7 @@ def make_video(SequenceObject):
         # Print frame nr
         y = int(height/15)
         x = int(width * 0.8)
-        cv2.putText(myframe(), str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), thickness=2)
+        cv2.putText(myframe(), str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), thickness=1)
 
 
 

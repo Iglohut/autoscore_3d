@@ -52,6 +52,7 @@ class BoxTemplate:
         self._grab_midframe() # Get a frame grayscale
         self._videodimension() # Set dimension of box
         self._boxcolor()
+        self.autoscorrect = int(max(self.midframe.shape) * 0.08) # Make object radius bigger if autoscore think it is exploring
 
         # Select correct template
         self.df = self.df_boxloc.loc[self.df_boxloc["Round"]["Round"]["Round"] == self.round] # Select BoxLocations of this round
@@ -144,7 +145,7 @@ class BoxTemplate:
             area_position = self.df[superlocation][sublocation]  # x,y coordinate
 
             if superlocation == "Object":
-                radius = int(np.linalg.norm(area_position - self.df["Corner"][sublocation]) / 2)
+                radius = int(np.linalg.norm(area_position - self.df["Corner"][sublocation]) / 2.5)
             elif superlocation == "Corner":
                 radius = int(np.linalg.norm(area_position - self.df["Object"][sublocation]) / 2.9)
             elif superlocation == "Wall": # Wall are represented as rectangles!
@@ -242,9 +243,10 @@ class BoxTemplate:
         # # areas = self._rotate_result(closest_area)
         #
         # areas = [self._rotate_result(distance) for distance in distances if distance[0] < 25]
-        object_detection_error = autoscore_correct * 25  # in normalized pixels;  control for autoscore!
+        object_detection_error = autoscore_correct * self.autoscorrect  # in normalized pixels;  control for autoscore!
         # in_pivots = [pivot[1:] for pivot in distances if pivot[0] <= (0 + int(pivot[1] == "Object") * object_detection_error)]
         in_pivots = [self._rotate_result(pivot)[1:] for pivot in distances if pivot[0] <= (0 + int(pivot[1] == "Object") * object_detection_error)]
+        # in_pivots = [self._rotate_result(pivot)[1:] for pivot in distances if pivot[0] <= (0 + object_detection_error)]
 
         return in_pivots
 
@@ -303,7 +305,7 @@ class BoxTemplate:
 # df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
 # # # df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
 # #
-# myvid = df["VideoName"][2701]
+# myvid = df["VideoName"][2]
 # temp = BoxTemplate(myvid)
 #
 # temp.df
@@ -316,8 +318,8 @@ class BoxTemplate:
 # # cv2.imwrite('/media/iglohut/Iglohut/BoxTemplate_example.png',temp.template)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
-#
-# #
+
+# # #
 #
 #
 # temp.detect([83, 238])

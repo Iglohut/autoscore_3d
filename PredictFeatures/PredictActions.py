@@ -61,7 +61,7 @@ class SequenceExtracter():
         """Returns thge autoscore estimation path of the current video"""
         dir = os.getcwd() + '/data/ehmt1/ehmt1_autoscores'
         files = os.listdir(dir)
-        myfile = [file for file in files if self.df.VideoName.split('/')[-1].split('.')[0] in file]
+        myfile = [file for file in files if self.df.VideoName.split('/')[-1].split('.')[0] in file if '#' not in file]
         myfile = dir + "/" + myfile[0]
         return myfile
 
@@ -70,7 +70,7 @@ class SequenceExtracter():
         """Returns for all frames decision exploring object or not"""
         df = pd.read_csv(self.autoscorefile)
         df = list(df["Explore"])
-        df = list(np.zeros(27)) + df # Because autoscore used windows of 27frames
+        df = list(np.zeros(13)) + df + list(np.zeros(14))# Because autoscore used windows of 27frames
         return df
 
     @property
@@ -196,7 +196,7 @@ class SequenceExtracter():
             return None
 
 
-myvid = SequenceExtracter(2701) # 2530 round8, 1670 round 7 norot,
+myvid = SequenceExtracter(9) # 2530 round8, 1670 round 7 norot, --2701 examplevid
 
 
 # myframe = IconFrame(myvid.template.midframe)

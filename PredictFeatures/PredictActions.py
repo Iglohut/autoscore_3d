@@ -134,7 +134,7 @@ class SequenceExtracter():
             print("There's no pivot locations yet.")
             pass
 
-        # TODO allow multiple actions
+        # TODO allow multiple actions: e.g. wall and corner; so also action seqeuence and then this..
         actions = []
         for i, pivot in enumerate(self.ActionSequence["pivot_locations"]):
             action = None

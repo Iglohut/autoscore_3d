@@ -148,7 +148,7 @@ class BoxTemplate:
             elif superlocation == "Corner":
                 radius = int(np.linalg.norm(area_position - self.df["Object"][sublocation]) / 2.9)
             elif superlocation == "Wall": # Wall are represented as rectangles!
-                wall_length = 12
+                wall_length = 12 # TODO Make wall full length and overlap with corner
                 wall_width = 4
                 sidewall_extension = 300
                 if sublocation == "North":
@@ -234,11 +234,11 @@ class BoxTemplate:
                 radius = location[2]
                 distance = abs(np.linalg.norm(area_position - position)) - radius # L2 norm distance
 
-            distances.append((distance, superlocation, sublocation))
+            distances.append(self._rotate_result((distance, superlocation, sublocation)))
 
         closest_area = min(distances)
 
-        return self._rotate_result(closest_area)
+        return closest_area
 
 
     def detect(self, position):

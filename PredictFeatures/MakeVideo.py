@@ -40,7 +40,7 @@ class IconFrame():
             if (overlay == self.wall).all(): # Change color to orange
                 overlay[(np.where(overlay[:, :, 3] > 0))] = [0, 33, 166, 255]
             elif (overlay == self.corner).all():
-                overlay[(np.where(overlay[:, :, 3] > 0))] = [0, 0, 139, 255]
+                overlay[(np.where(overlay[:, :, 3] > 0))] = [0, 190, 0, 255]
             elif (overlay == self.explore).all():
                 overlay[(np.where(overlay[:, :, 3] > 0))] = [205, 0, 0, 255]
             overlay[:, :, 3] = old_alpha

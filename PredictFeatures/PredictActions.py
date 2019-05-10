@@ -4,11 +4,14 @@ import os
 import cv2
 from PredictFeatures.VisualizeBox import BoxTemplate
 from PredictFeatures.MakeVideo import *
+import csv
+import math
 
-class SequenceExtracter():
+class SequenceExtracter:
     df_all = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
     def __init__(self, vidnumber):
-        self.df = self.df_all.iloc[vidnumber] # Dataframe with trial information
+        self.df = SequenceExtracter.df_all.iloc[vidnumber] # Dataframe with trial information
+        self.vidnumber = vidnumber
 
         # The action list for all frames
         self.ActionSequence = {
@@ -28,12 +31,12 @@ class SequenceExtracter():
 
 
         else:
-            print("My apologies, this video was not analyzed by autoscore and DLC. Video({}):".format(vidnumber), self.df.VideoName)
+            print("My apologies, this video was not analyzed by autoscore and DLC OR is already fully analyzed!. Video({}):".format(vidnumber), self.df.VideoName)
 
     @property
     def canalyze(self):
         """returns ff the video was actually analyzed according to file"""
-        if self.df.StatusPredicted == 1:
+        if self.df.StatusPredicted == 1 and not math.isnan(self.df.genotype): # If analyzed AND train data available
             return True
         else:
             return False
@@ -114,9 +117,12 @@ class SequenceExtracter():
         """
         Creates sequence of all pivot locations where the mouse was for all frames.
         """
+        if not self.canalyze:
+            return
+
         pivot_locations = []
         for i in range(len(self)): # for all estimated frames
-            print("Get pivot locations: {}/{}".format(i, len(self)))
+            # print("Get pivot locations: {}/{}".format(i, len(self)))
             position = self.headPoint(i)
             location = self.template.detect(position, self.ActionSequence["autoscores"][i])
             pivot_locations.append(location)
@@ -130,7 +136,7 @@ class SequenceExtracter():
         """
         if len(self.ActionSequence["pivot_locations"]) == 0:
             print("There's no pivot locations yet.")
-            pass
+            return
 
         all_actions = []
         for i, pivots in enumerate(self.ActionSequence["pivot_locations"]):
@@ -178,6 +184,19 @@ class SequenceExtracter():
             print("Cannot make video. Either no actions yet or ambiguous videolength.")
 
 
+    def save_actions(self, path=None):
+        if path is None:
+            path = os.getcwd() + '/data/ehmt1/ehmt1_actions/' + self.vidname.split('.')[0].split('/')[-1] + '.csv'
+
+        with open(path, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(self.ActionSequence['actions'])
+
+    def save_status(self, status=3):
+        SequenceExtracter.df_all.loc[self.vidnumber, 'StatusPredicted'] = status
+        SequenceExtracter.df_all.to_csv('./data/ehmt1/VideoNamesStatus.csv', index=False)
+        print("Successfully updated the status({}) of {}".format(status, self.vidname))
+
     def __call__(self):
         return self.ActionSequence
 
@@ -196,7 +215,7 @@ class SequenceExtracter():
             return None
 
 
-myvid = SequenceExtracter(9) # 2530 round8, 1670 round 7 norot, --2701 examplevid
+# myvid = SequenceExtracter(760) # 2530 round8, 1670 round 7 norot, --2701 examplevid
 
 
 # myframe = IconFrame(myvid.template.midframe)
@@ -209,11 +228,33 @@ myvid = SequenceExtracter(9) # 2530 round8, 1670 round 7 norot, --2701 examplevi
 
 
 # Make video
-myvid.get_pivot_locations()
-myvid.get_actions()
-myvid.make_video()
-
-
+# myvid.get_pivot_locations()
+# myvid.get_actions()
+# # myvid.make_video()
+# myvid.save_actions()
 # for i in range(len(myvid.ActionSequence["actions"])):
 #     print(myvid.ActionSequence["actions"][i], i, myvid.ActionSequence["pivot_locations"][i], myvid.headPoint(i))
 
+
+# listpath = '/media/iglohut/MD_Smits/Internship/autoscore_3d/data/ehmt1/ehmt1_actions/mouse_training_OS_5trials_inteldis_1_7animals_t0002_raw.csv'
+# with open(listpath, 'r') as f:
+#     reader = csv.reader(f)
+#     mylist = list(reader)
+
+# TODO make class that iterates over all len(SeuenceExtracter.df_all) to analyze and save the data
+# TODO - make that multiprocessing
+
+# fails = []
+# for i in range(len(SequenceExtracter.df_all)):
+#
+#     myvid = SequenceExtracter(i)
+#
+#     if myvid.canalyze:
+#         print("Analyzing video({}): {}".format(i, myvid.vidname))
+#         myvid.get_pivot_locations()
+#         myvid.get_actions()
+#         myvid.save_actions()
+#         myvid.save_status(status=3)
+#     else:
+#         print("Couldn't analyze video({})".format(i))
+#         fails.append(i)

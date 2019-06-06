@@ -168,6 +168,8 @@ def make_video(SequenceObject):
 
     for i in range(_vidlength(vp)):
         ret, frame = cap.read()
+        #
+        # if i in range(5848, 6100):
         if not ret:
             print("Grab frame unsuccessful. ABORT MISSION!")
             break

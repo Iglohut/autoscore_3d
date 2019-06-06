@@ -9,7 +9,7 @@ import math
 
 class SequenceExtracter:
     df_all = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
-    def __init__(self, vidnumber):
+    def __init__(self, vidnumber,):
         self.df = SequenceExtracter.df_all.iloc[vidnumber] # Dataframe with trial information
         self.vidnumber = vidnumber
 
@@ -21,7 +21,7 @@ class SequenceExtracter:
         }
 
 
-        if self.canalyze:
+        if self.canalyze or True: # Or True is temporary
             self.template = BoxTemplate(self.df.VideoName) # Get the BoxTemplate
             self.df_pose = pd.read_csv(self.posefile, header=[0, 1], skipinitialspace=True)
 
@@ -74,6 +74,8 @@ class SequenceExtracter:
         df = pd.read_csv(self.autoscorefile)
         df = list(df["Explore"])
         df = list(np.zeros(13)) + df + list(np.zeros(14))# Because autoscore used windows of 27frames
+        len_diff = abs(len(self) - len(df))
+        df += list(np.zeros(len_diff)) # Quick dirty length inconsistency fix for DLC/autoscore
         return df
 
     @property
@@ -117,8 +119,8 @@ class SequenceExtracter:
         """
         Creates sequence of all pivot locations where the mouse was for all frames.
         """
-        if not self.canalyze:
-            return
+        # if not self.canalyze:
+        #     return
 
         pivot_locations = []
         for i in range(len(self)): # for all estimated frames
@@ -215,7 +217,7 @@ class SequenceExtracter:
             return None
 
 
-# myvid = SequenceExtracter(760) # 2530 round8, 1670 round 7 norot, --2701 examplevid
+myvid = SequenceExtracter(3477 + 28) # 2530 round8, 1670 round 7 norot, --2701 examplevid
 
 
 # myframe = IconFrame(myvid.template.midframe)
@@ -228,9 +230,9 @@ class SequenceExtracter:
 
 
 # Make video
-# myvid.get_pivot_locations()
-# myvid.get_actions()
-# # myvid.make_video()
+myvid.get_pivot_locations()
+myvid.get_actions()
+myvid.make_video()
 # myvid.save_actions()
 # for i in range(len(myvid.ActionSequence["actions"])):
 #     print(myvid.ActionSequence["actions"][i], i, myvid.ActionSequence["pivot_locations"][i], myvid.headPoint(i))

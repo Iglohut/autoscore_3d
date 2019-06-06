@@ -270,7 +270,8 @@ class BoxTemplate:
         output = frame.copy()
         alpha = 0.8
 
-        for location in self.full_locations:
+        full_locations = self.full_locations[:4] + self.full_locations[8:12] + self.full_locations[4:8] # So that corners are drawn over walls
+        for location in full_locations:
             superlocation = location[0]
             sublocation = location[1]
             area_position = tuple(self.df[superlocation][sublocation].values[0])  # x,y coordinates
@@ -278,10 +279,13 @@ class BoxTemplate:
             if superlocation == "Wall": # Draw wall rectangles
                 rectangle = location[2]
                 pt1, pt2 = rectangle.points()
-                cv2.rectangle(overlay, pt1, pt2, color=150, thickness=-1)
+                cv2.rectangle(overlay, pt1, pt2, color=150, thickness=-1) # Fill rectangle
+                cv2.rectangle(overlay, pt1, pt2, color=0, thickness=1) # Show outline
             else: # Draw point circles
+            # elif superlocation == "Corner":
                 radius = location[2]
                 cv2.circle(overlay, area_position, radius=int(radius), color=150, thickness=-1)
+                cv2.circle(overlay, area_position, radius=int(radius), color=0, thickness=1)
 
         # Draw box outline
         cv2.line(output, tuple(self.df["Corner"]["UL"].values[0]), tuple(self.df["Corner"]["UR"].values[0]), color=250, thickness=2)
@@ -305,7 +309,7 @@ class BoxTemplate:
 # df = pd.read_csv('./data/ehmt1/VideoNamesStatus.csv')
 # # # df_boxloc = pd.read_csv('./data/ehmt1/BoxLocations.csv', header=[0, 1, 2])
 # #
-# myvid = df["VideoName"][2]
+# myvid = df["VideoName"][600]
 # temp = BoxTemplate(myvid)
 #
 # temp.df
@@ -315,7 +319,7 @@ class BoxTemplate:
 # #
 # #
 # cv2.imshow('Templateee', temp.template)
-# # cv2.imwrite('/media/iglohut/Iglohut/BoxTemplate_example.png',temp.template)
+# cv2.imwrite('/home/iglohut/OneDrive/RU/Double Internship/Thesis/Figures/BoxTemplate_example.png',temp.template)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 

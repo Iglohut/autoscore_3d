@@ -1,7 +1,7 @@
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 # The GPU id to use, usually either "0" or "1"
-os.environ["CUDA_VISIBLE_DEVICES"]="1" 
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 from i3d_generator import i3d_generator, SS_generator
 import h5py
@@ -10,7 +10,8 @@ from pathlib import Path
 from OS_utils import read_yaml, get_slices, Logger
 from network import get_network, noob_network, get_network_bigger, original_networkish, ST_network
 
-
+from keras.models import Model, load_model
+from keras import backend as K
 from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 import copy
@@ -41,9 +42,12 @@ def train():
     # Creating or loading model
 #    model_final = get_network(model_path)
 #     model_final = get_network_bigger(model_path, opt='RMSprop')
-    model_final = noob_network() # Weak model with same input-output to debug
+#     model_final = noob_network() # Weak model with same input-output to debug
 #    model_final = original_networkish(model_path, (n_frames,) + data["X"].shape[1:])
 #     model_final = ST_network(model_path, (n_frames,) + data["X"].shape[1:])
+    model_final = load_model(os.getcwd() + '/project/henk_checkpoint')
+
+
     
 
     # Metric logger
@@ -65,7 +69,6 @@ def train():
         for traini in range(n_iters_train): # Training loop
             X, Y = generator_train()
             metrics_train.append(model_final.train_on_batch(X, Y)) # This trains the model!
-
 
             Y_predicted = model_final.predict_on_batch(X)
             Y_reals = np.append(copy.copy(Y_reals), copy.copy(Y[:,0]))
@@ -138,3 +141,5 @@ train()
 # #
 # # plt.subplot(121),plt.imshow(frame.astype(np.int32)),plt.title('Input'), plt.axis('off')
 # # plt.subplot(122),plt.imshow(noised_image.astype(np.int32)),plt.title('Output'), plt.axis('off')
+
+

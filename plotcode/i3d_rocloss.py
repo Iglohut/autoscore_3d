@@ -27,8 +27,11 @@ ax2.tick_params(axis='y', labelcolor=color)
 # plt.legend(['Validation loss', 'Training loss'], loc="center right")
 
 
-fig.legend(['Validation AUROC', 'Training AUROC', 'Validation loss', 'Training loss'], loc=1)
-fig.tight_layout()  # otherwise the right y-label is slightly clipped
+leg = fig.legend(['Validation AUROC', 'Training AUROC', 'Validation loss', 'Training loss'], loc='center')
+if leg:
+    leg.draggable()
+
+# fig.tight_layout()  # otherwise the right y-label is slightly clipped
 
 plt.savefig(os.getcwd() + '/plotcode/' + 'i3dautoscore_Aucloss.pdf')
 

@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c91c9ff8-0027-4ad3-a212-932d8749c4fd" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/PredictFeatures/MakeFeatures.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PredictFeatures/MakeVideo.py" beforeDir="false" afterPath="$PROJECT_DIR$/PredictFeatures/MakeVideo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plotcode/i3d_rocloss.py" beforeDir="false" afterPath="$PROJECT_DIR$/plotcode/i3d_rocloss.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plotcode/i3dautoscore_Aucloss.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/plotcode/i3dautoscore_Aucloss.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plotcode/i3dautoscore_ROCcurve.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/plotcode/i3dautoscore_ROCcurve.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PredictFeatures/MakeFeatures.py" beforeDir="false" afterPath="$PROJECT_DIR$/PredictFeatures/MakeFeatures.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,7 +16,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PredictFeatures/MakeVideo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2865">
+            <state relative-caret-position="494">
               <caret line="195" selection-start-line="195" selection-end-line="195" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
@@ -32,7 +28,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PredictFeatures/PredictActions.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
+            <state relative-caret-position="-3361">
               <caret line="6" selection-start-line="6" selection-end-line="6" selection-end-column="10" />
             </state>
           </provider>
@@ -53,20 +49,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PredictFeatures/MakeFeatures.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="87" column="10" lean-forward="true" selection-start-line="87" selection-start-column="10" selection-end-line="87" selection-end-column="10" />
+            <state relative-caret-position="314">
+              <caret line="354" column="29" selection-start-line="354" selection-start-column="29" selection-end-line="354" selection-end-column="29" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PredictUtils/predictData.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2490">
-              <caret line="166" column="25" selection-start-line="166" selection-start-column="25" selection-end-line="166" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -220,8 +207,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21551247" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21828255" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -234,7 +222,7 @@
       <window_info anchor="bottom" id="TODO" order="7" weight="0.32899022" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.500277" side_tool="true" weight="0.3583062" />
       <window_info active="true" anchor="bottom" id="Python Console" order="9" sideWeight="0.499723" visible="true" weight="0.37024972" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.33333334" />
+      <window_info anchor="bottom" id="Terminal" order="10" weight="0.33224756" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -349,23 +337,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PredictFeatures/MakeVideo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2865">
-          <caret line="195" selection-start-line="195" selection-end-line="195" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PredictFeatures/PredictActions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" selection-start-line="6" selection-end-line="6" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/plotcode/i3d_rocloss.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -376,17 +347,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/PredictFeatures/MakeVideo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="494">
+          <caret line="195" selection-start-line="195" selection-end-line="195" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PredictUtils/predictData.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2490">
+        <state relative-caret-position="1110">
           <caret line="166" column="25" selection-start-line="166" selection-start-column="25" selection-end-line="166" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PredictFeatures/PredictActions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3361">
+          <caret line="6" selection-start-line="6" selection-end-line="6" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/PredictFeatures/MakeFeatures.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="87" column="10" lean-forward="true" selection-start-line="87" selection-start-column="10" selection-end-line="87" selection-end-column="10" />
+        <state relative-caret-position="314">
+          <caret line="354" column="29" selection-start-line="354" selection-start-column="29" selection-end-line="354" selection-end-column="29" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
